@@ -35,7 +35,10 @@ Task("UnitTest")
 
 		if(AppVeyor.IsRunningOnAppVeyor)
 		{
-			AppVeyor.UploadTestResults(resultsDirectory, AppVeyorTestResultsType.MSTest);
+            foreach(var file in GetFiles(resultsDirectory))
+            {
+			    AppVeyor.UploadTestResults(file, AppVeyorTestResultsType.MSTest);
+            }
 		}
 	});
 
