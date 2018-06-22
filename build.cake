@@ -25,17 +25,17 @@ Task("UnitTest")
 	.IsDependentOn("Build")
 	.IsDependentOn("Setup")
 	.Does(() => {
-		var resultsFile = artifactsDirectory + "/TestResults";
+		var resultsDirectory = artifactsDirectory + "/TestResults";
 
         DotNetCoreVSTest($"{artifactsDirectory}/LambdaS3FileZipper.Test.dll", new DotNetCoreVSTestSettings
         {
             Logger = "trx",
-            ArgumentCustomization = a => a.Append($"--ResultsDirectory:{resultsFile}")
+            ArgumentCustomization = a => a.Append($"--ResultsDirectory:{resultsDirectory}")
         });
 
 		if(AppVeyor.IsRunningOnAppVeyor)
 		{
-			AppVeyor.UploadTestResults(resultsFile + "/*", AppVeyorTestResultsType.MSTest);
+			AppVeyor.UploadTestResults(resultsDirectory, AppVeyorTestResultsType.MSTest);
 		}
 	});
 
