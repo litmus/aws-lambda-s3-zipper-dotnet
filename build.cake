@@ -2,7 +2,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var version = AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Build.Version : "0.0.1";
+var version = AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Build.Version + "-alpha" : "0-dev";
 var releaseBinPath = "./LambdaS3FileZipper/bin/Release";
 var artifactsDirectory = "./artifacts";
 
@@ -16,7 +16,8 @@ Task("Build")
             var settings = new DotNetCoreBuildSettings
             {
                 Configuration = configuration,
-                OutputDirectory = artifactsDirectory
+                OutputDirectory = artifactsDirectory,
+				VersionSuffix = version,
             };
             DotNetCoreBuild("./LambdaS3FileZipper.sln", settings);
 	});
