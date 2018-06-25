@@ -12,6 +12,10 @@
     <FileVersion>0.1.0.1</FileVersion>
     <DefineConstants>LIBLOG_PORTABLE</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.18.5" />
     <PackageReference Include="LibLog" Version="5.0.0" />
