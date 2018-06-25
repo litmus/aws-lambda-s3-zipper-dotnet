@@ -2,13 +2,13 @@
 
 namespace LambdaS3FileZipper
 {
-    public class ZipperHandler : IHandler
+    public class Handler : IHandler
     {
 	    private readonly IFileRetriever fileRetriever;
 	    private readonly IFileZipper fileZipper;
 	    private readonly IFileUploader fileUploader;
 
-		public ZipperHandler(IFileRetriever fileRetriever, IFileZipper fileZipper, IFileUploader fileUploader)
+		public Handler(IFileRetriever fileRetriever, IFileZipper fileZipper, IFileUploader fileUploader)
 		{
 			this.fileRetriever = fileRetriever;
 			this.fileZipper = fileZipper;
@@ -17,7 +17,7 @@ namespace LambdaS3FileZipper
 
 	    public Response Handle(Request request)
 	    {
-		    throw new NotImplementedException();
+			throw new NotImplementedException();
 	    }
     }
 }

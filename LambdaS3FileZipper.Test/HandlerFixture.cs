@@ -3,9 +3,9 @@ using NUnit.Framework;
 
 namespace LambdaS3FileZipper.Test
 {
-    public class ZipperHandlerFixture
+    public class HandlerFixture
     {
-	    private ZipperHandler zipperHandler;
+	    private Handler handler;
 
 	    private IFileRetriever fileRetriever;
 	    private IFileZipper fileZipper;
@@ -20,7 +20,7 @@ namespace LambdaS3FileZipper.Test
 
 			fileUploader = Substitute.For<IFileUploader>();
 
-			zipperHandler = new ZipperHandler(fileRetriever, fileZipper, fileUploader);
+			handler = new Handler(fileRetriever, fileZipper, fileUploader);
 		}
 
         [Test]
@@ -28,7 +28,7 @@ namespace LambdaS3FileZipper.Test
         {
 			var request = new Request();
 
-	        var response = zipperHandler.Handle(request);
+	        var response = handler.Handle(request);
 
 			Assert.That(response, Is.Not.Null);
         }
