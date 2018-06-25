@@ -1,4 +1,10 @@
-public class HelloWorld
+namespace LambdaS3FileZipper
 {
-    public string HelloText { get; set; } = "Hello";
+    using LambdaS3FileZipper.Logging;
+
+    public class HelloWorld
+    {
+        internal ILog Logger { get; set; }
+        public string HelloText { get; set; } = "Hello";
+    }
 }
