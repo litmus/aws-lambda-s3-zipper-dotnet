@@ -14,9 +14,9 @@ namespace LambdaS3FileZipper.Aws
 		    this.s3Client = s3Client;
 	    }
 
-	    public async Task<IEnumerable<string>> Retrieve(string bucket, string resource)
+	    public async Task<IEnumerable<string>> Retrieve(string bucket, string resource, CancellationToken cancellationToken)
 	    {
-		    return await s3Client.List(bucket, resource, CancellationToken.None);
+		    return await s3Client.List(bucket, resource, cancellationToken);
 	    }
     }
 }
