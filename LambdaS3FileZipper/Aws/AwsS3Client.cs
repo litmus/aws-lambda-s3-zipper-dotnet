@@ -43,8 +43,7 @@ namespace LambdaS3FileZipper.Aws
 			return objects;
 		}
 
-		public Task Upload(string bucketName, string resourceName, string localFile,
-			CancellationToken cancellationToken)
+		public Task Upload(string bucketName, string resourceName, string localFile, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
