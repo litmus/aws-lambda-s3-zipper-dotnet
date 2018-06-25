@@ -29,7 +29,7 @@ namespace LambdaS3FileZipper.Test
         [Test]
         public async Task Handle_ShouldHandleRequestAndProvideAResponse()
         {
-			var request = new Request("bucket", "resource-key");
+			var request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource");
 
 	        var response = await handler.Handle(request);
 
