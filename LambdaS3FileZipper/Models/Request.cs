@@ -2,13 +2,21 @@ namespace LambdaS3FileZipper.Models
 {
 	public class Request
 	{
-		public Request(string bucketName, string resourceName)
+		public Request(
+			string originBucketName,
+			string originResourceName,
+			string destinationBucketName,
+			string destinationResourceName)
 		{
-			BucketName = bucketName;
-			ResourceName = resourceName;
+			OriginBucketName = originBucketName;
+			OriginResourceName = originResourceName;
+			DestinationBucketName = destinationBucketName;
+			DestinationResourceName = destinationResourceName;
 		}
 
-		public string BucketName { get; }
-		public string ResourceName { get; }
+		public string OriginBucketName { get; }
+		public string OriginResourceName { get; }
+		public string DestinationBucketName { get; }
+		public string DestinationResourceName { get; }
 	}
 }

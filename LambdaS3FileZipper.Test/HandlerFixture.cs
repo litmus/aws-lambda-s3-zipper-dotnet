@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
 using NSubstitute;
 using NUnit.Framework;
@@ -25,11 +27,11 @@ namespace LambdaS3FileZipper.Test
 		}
 
         [Test]
-        public void Handle_ShouldHandleRequestAndProvideAResponse()
+        public async Task Handle_ShouldHandleRequestAndProvideAResponse()
         {
-			var request = new Request();
+			var request = new Request("bucket", "resource-key");
 
-	        var response = handler.Handle(request);
+	        var response = await handler.Handle(request);
 
 			Assert.That(response, Is.Not.Null);
         }
