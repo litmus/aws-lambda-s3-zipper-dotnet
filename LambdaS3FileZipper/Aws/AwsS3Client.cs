@@ -21,14 +21,14 @@ namespace LambdaS3FileZipper.Aws
 			client = new AmazonS3Client(regionEndpoint);
 		}
 
-		public async Task<IEnumerable<string>> List(string bucketName, string resource,
-			CancellationToken cancellationToken)
+		public async Task<IEnumerable<string>> List(string bucketName, string resource, CancellationToken cancellationToken)
 		{
 			var objects = new List<string>();
 
 			var request = new ListObjectsV2Request
 			{
-				BucketName = bucketName
+				BucketName = bucketName,
+				Prefix = resource
 			};
 
 			ListObjectsV2Response response;
