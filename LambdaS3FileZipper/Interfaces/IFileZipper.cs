@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public interface IFileZipper
+namespace LambdaS3FileZipper.Interfaces
 {
-    Task<string> Compress(IEnumerable<string> resources);
+	public interface IFileZipper
+	{
+		Task<string> Compress(IEnumerable<string> resources);
+	}
 }
