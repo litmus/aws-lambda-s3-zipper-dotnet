@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.18.5" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="2.8.2" />
   </ItemGroup>
 
