@@ -7,21 +7,21 @@ using NUnit.Framework;
 
 namespace LambdaS3FileZipper.Test
 {
-    public class HandlerFixture
-    {
-	    private Handler handler;
+	public class HandlerFixture
+	{
+		private Handler handler;
 
-	    private IFileRetriever fileRetriever;
-	    private IFileZipper fileZipper;
-	    private IFileUploader fileUploader;
+		private IFileRetriever fileRetriever;
+		private IFileZipper fileZipper;
+		private IFileUploader fileUploader;
 
-	    private Request request;
-	    private IEnumerable<string> files;
-	    private string compressedFile;
+		private Request request;
+		private IEnumerable<string> files;
+		private string compressedFile;
 		private string url;
 
 		[SetUp]
-        public void Setup()
+		public void Setup()
 		{
 			request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource");
 
@@ -43,36 +43,36 @@ namespace LambdaS3FileZipper.Test
 			handler = new Handler(fileRetriever, fileZipper, fileUploader);
 		}
 
-        [Test]
-        public async Task Handle_ShouldHandleRequestAndProvideAResponse()
-        {
-	        var response = await handler.Handle(request);
+		[Test]
+		public async Task Handle_ShouldHandleRequestAndProvideAResponse()
+		{
+			var response = await handler.Handle(request);
 
 			Assert.That(response.Url, Is.EqualTo(url));
-        }
+		}
 
-	    [Test]
-	    public async Task Handle_ShouldRetrieveFilesBasedOnRequest()
-	    {
-		    await handler.Handle(request);
+		[Test]
+		public async Task Handle_ShouldRetrieveFilesBasedOnRequest()
+		{
+			await handler.Handle(request);
 
-		    await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName);
-	    }
+			await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName);
+		}
 
-	    [Test]
-	    public async Task Handle_ShouldCompressFilesRetrieved()
-	    {
-		    await handler.Handle(request);
+		[Test]
+		public async Task Handle_ShouldCompressFilesRetrieved()
+		{
+			await handler.Handle(request);
 
-		    await fileZipper.Received().Compress(files);
-	    }
+			await fileZipper.Received().Compress(files);
+		}
 
-	    [Test]
-	    public async Task Handle_ShouldUploadCompressedFile()
-	    {
-		    await handler.Handle(request);
+		[Test]
+		public async Task Handle_ShouldUploadCompressedFile()
+		{
+			await handler.Handle(request);
 
-		    await fileUploader.Received().Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile);
-	    }
+			await fileUploader.Received().Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile);
+		}
 	}
 }
