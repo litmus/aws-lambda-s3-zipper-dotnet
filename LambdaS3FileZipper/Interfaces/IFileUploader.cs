@@ -1,6 +1,9 @@
 using System.Threading.Tasks;
 
-public interface IFileUploader
+namespace LambdaS3FileZipper.Interfaces
 {
-	Task Upload(string bucketName, string resourceName, string compressedFileName);
+	public interface IFileUploader
+	{
+		Task<string> Upload(string bucketName, string resourceName, string compressedFileName);
+	}
 }
