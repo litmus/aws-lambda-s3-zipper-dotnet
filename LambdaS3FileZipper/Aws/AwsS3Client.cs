@@ -7,7 +7,7 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-namespace LambdaS3FileZipper
+namespace LambdaS3FileZipper.Aws
 {
     public class AwsS3Client : IAwsS3Client
     {
