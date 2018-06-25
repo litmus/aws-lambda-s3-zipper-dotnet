@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="2.8.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Aws\" />
+  </ItemGroup>
+
 </Project>
