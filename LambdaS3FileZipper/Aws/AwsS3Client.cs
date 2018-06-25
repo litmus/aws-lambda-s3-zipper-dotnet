@@ -34,6 +34,8 @@ namespace LambdaS3FileZipper.Aws
 			ListObjectsV2Response response;
 			do
 			{
+				cancellationToken.ThrowIfCancellationRequested();
+
 				response = await client.ListObjectsV2Async(request, cancellationToken);
 				objects.AddRange(response.S3Objects.Select(obj => obj.Key));
 				request.ContinuationToken = response.ContinuationToken;
