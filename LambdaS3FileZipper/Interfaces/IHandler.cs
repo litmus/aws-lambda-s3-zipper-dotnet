@@ -1,4 +1,10 @@
-public interface IHandler
+using System.Threading.Tasks;
+using LambdaS3FileZipper.Models;
+
+namespace LambdaS3FileZipper.Interfaces
 {
-    Response Handle(Request request);
+	public interface IHandler
+	{
+		Task<Response> Handle(Request request);
+	}
 }
