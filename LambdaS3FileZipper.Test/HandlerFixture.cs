@@ -1,3 +1,4 @@
+using LambdaS3FileZipper.Models;
 using NSubstitute;
 using NUnit.Framework;
 

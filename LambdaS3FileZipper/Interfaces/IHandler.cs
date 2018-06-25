@@ -1,4 +1,9 @@
-public interface IHandler
+using LambdaS3FileZipper.Models;
+
+namespace LambdaS3FileZipper.Interfaces
 {
-    Response Handle(Request request);
+	public interface IHandler
+	{
+		Response Handle(Request request);
+	}
 }

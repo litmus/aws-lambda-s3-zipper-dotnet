@@ -1,4 +1,6 @@
 ﻿using System;
+using LambdaS3FileZipper.Interfaces;
+using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper
 {
