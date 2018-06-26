@@ -44,7 +44,7 @@ namespace LambdaS3FileZipper.Aws
 			return objects;
 		}
 
-		public async Task Download(string bucketName, string resource, string destinationPath, CancellationToken cancellationToken)
+		public async Task<string> Download(string bucketName, string resource, string destinationPath, CancellationToken cancellationToken)
 		{
 			if (File.Exists(destinationPath))
 			{
@@ -68,7 +68,9 @@ namespace LambdaS3FileZipper.Aws
 			using (var fileStream = File.OpenWrite(localPath))
 			{
 				await response.ResponseStream.CopyToAsync(fileStream);
-			}	
+			}
+
+			return localPath;
 		}
 
 		public Task Upload(string bucketName, string resourceName, string localFile, CancellationToken cancellationToken)
