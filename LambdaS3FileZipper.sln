@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaS3FileZipper", "Lambd
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaS3FileZipper.Test", "LambdaS3FileZipper.Test\LambdaS3FileZipper.Test.csproj", "{21982D49-2F6C-4A11-868D-6B04880C38F2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaS3FileZipper.IntegrationTests", "LambdaS3FileZipper.IntegrationTests\LambdaS3FileZipper.IntegrationTests.csproj", "{26165F86-E52F-41BB-97B0-1B24979CB826}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{21982D49-2F6C-4A11-868D-6B04880C38F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21982D49-2F6C-4A11-868D-6B04880C38F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21982D49-2F6C-4A11-868D-6B04880C38F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26165F86-E52F-41BB-97B0-1B24979CB826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26165F86-E52F-41BB-97B0-1B24979CB826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26165F86-E52F-41BB-97B0-1B24979CB826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26165F86-E52F-41BB-97B0-1B24979CB826}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
