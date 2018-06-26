@@ -14,9 +14,11 @@ namespace LambdaS3FileZipper.Aws
 			this.client = client;
 		}
 
-	    public async Task<string> Upload(string bucketName, string resourceName, string compressedFileName)
+	    public async Task<string> Upload(string bucketName, string resourceName, string compressedFileName, CancellationToken token)
 	    {
-		    await client.Upload(bucketName, resourceName, compressedFileName, CancellationToken.None);
+			token.ThrowIfCancellationRequested();
+
+		    await client.Upload(bucketName, resourceName, compressedFileName, token);
 		    return await client.GenerateUrl(bucketName, resourceName);
 	    }
     }

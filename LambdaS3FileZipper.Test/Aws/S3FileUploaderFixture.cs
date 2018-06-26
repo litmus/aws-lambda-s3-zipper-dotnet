@@ -17,6 +17,7 @@ namespace LambdaS3FileZipper.Test.Aws
 	    private string resource = "resource";
 	    private string compressedFile = "compressed-file";
 		private string url = "s3.com/compressed-file";
+	    private CancellationToken regular = new CancellationToken();
 
 		[SetUp]
 	    public void SetUp()
@@ -30,15 +31,15 @@ namespace LambdaS3FileZipper.Test.Aws
 	    [Test]
 	    public async Task Upload_ShouldUploadLocalCompressedFile()
 	    {
-		    await uploader.Upload(bucket, resource, compressedFile);
+		    await uploader.Upload(bucket, resource, compressedFile, regular);
 
-		    await client.Received().Upload(bucket, resource, compressedFile, CancellationToken.None);
+		    await client.Received().Upload(bucket, resource, compressedFile, regular);
 	    }
 
 	    [Test]
 	    public async Task Upload_ShouldGenerateAnUrlForUploadedResource()
 	    {
-		    await uploader.Upload(bucket, resource, compressedFile);
+		    await uploader.Upload(bucket, resource, compressedFile, regular);
 
 		    await client.Received().GenerateUrl(bucket, resource);
 	    }
@@ -46,9 +47,19 @@ namespace LambdaS3FileZipper.Test.Aws
 	    [Test]
 	    public async Task Upload_ShouldReturnUrl()
 	    {
-		    var generatedUrl = await uploader.Upload(bucket, resource, compressedFile);
+		    var generatedUrl = await uploader.Upload(bucket, resource, compressedFile, regular);
 
 			Assert.That(generatedUrl, Is.EqualTo(url));
+	    }
+
+	    [Test]
+	    public async Task Upload_ShouldThrowExceptionWhenCanceled()
+	    {
+			var canceled = new CancellationToken(canceled: true);
+
+		    Assert.ThrowsAsync<TaskCanceledException>(() => uploader.Upload(bucket, resource, compressedFile, canceled));
+
+		    await client.DidNotReceive().Upload(bucket, resource, compressedFile, canceled);
 	    }
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Logging;
@@ -29,7 +30,8 @@ namespace LambdaS3FileZipper
 
 			var compressedFileName = await fileZipper.Compress(files);
 
-			var url = await fileUploader.Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFileName);
+			var url = await fileUploader.Upload(
+				request.DestinationBucketName, request.DestinationResourceName, compressedFileName, CancellationToken.None);
 
 			return new Response(url);
 		}
