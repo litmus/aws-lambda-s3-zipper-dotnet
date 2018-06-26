@@ -57,8 +57,15 @@ namespace LambdaS3FileZipper.Aws
 				Key = resource
 			};
 
+			if (!Directory.Exists(destinationPath))
+			{
+				Directory.CreateDirectory(destinationPath);
+			}
+
+			var localPath = Path.Combine(destinationPath, resource);
+
 			using (var response = await client.GetObjectAsync(request, cancellationToken))
-			using (var fileStream = File.OpenWrite(destinationPath))
+			using (var fileStream = File.OpenWrite(localPath))
 			{
 				await response.ResponseStream.CopyToAsync(fileStream);
 			}	
