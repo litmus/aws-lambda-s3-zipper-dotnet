@@ -26,21 +26,21 @@ namespace LambdaS3FileZipper
 
 		public async Task<Response> Handle(Request request, ILambdaContext lambdaContext)
 		{
-            var sw = Stopwatch.StartNew();
-            log.Trace("Received zip request @{Request} - {AwsRequestId}", request, lambdaContext.AwsRequestId);
+			var stopwatch = Stopwatch.StartNew();
+			log.Trace("Received zip request @{Request} - {AwsRequestId}", request, lambdaContext.AwsRequestId);
 
 			var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName);
 			log.Debug("Retrieved files from {Bucket}:{Resource}", request.OriginBucketName, request.OriginResourceName);
 
 			var compressedFileName = await fileZipper.Compress(directory);
 			log.Debug("Compressed file to {CompressedFileName}", compressedFileName);
-			
-      var url = await fileUploader.Upload(
+
+			var url = await fileUploader.Upload(
 				request.DestinationBucketName, request.DestinationResourceName, compressedFileName, CancellationToken.None);
+			log.Debug("Uploaded file to {Url}", url);
 
-            log.Debug("Uploaded file to {Url}", url);
-
-            log.Trace("Completed zip request {AwsRequestId} in {ElapsedMilliseconds} ms", lambdaContext.AwsRequestId, sw.ElapsedMilliseconds);
+			log.Trace("Completed zip request {AwsRequestId} in {ElapsedMilliseconds} ms",
+				lambdaContext.AwsRequestId, stopwatch.ElapsedMilliseconds);
 			return new Response(url);
 		}
 	}
