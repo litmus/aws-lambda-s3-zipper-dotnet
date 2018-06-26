@@ -13,6 +13,6 @@ namespace LambdaS3FileZipper.Models
 			Url = url;
 		}
 
-		public string Url;
+		public string Url { get; set; }
 	}
 }
