@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
 using NSubstitute;
@@ -9,8 +10,8 @@ namespace LambdaS3FileZipper.Test
 	public class HandlerFixture
 	{
 		private Handler handler;
-
-		private IFileRetriever fileRetriever;
+        private ILambdaContext lambdaContext;
+        private IFileRetriever fileRetriever;
 		private IFileZipper fileZipper;
 		private IFileUploader fileUploader;
 
@@ -40,12 +41,14 @@ namespace LambdaS3FileZipper.Test
 			fileUploader.Upload(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>()).Returns(url);
 
 			handler = new Handler(fileRetriever, fileZipper, fileUploader);
+
+            lambdaContext = Substitute.For<ILambdaContext>();
 		}
 
 		[Test]
 		public async Task Handle_ShouldHandleRequestAndProvideAResponse()
 		{
-			var response = await handler.Handle(request);
+			var response = await handler.Handle(request, lambdaContext);
 
 			Assert.That(response.Url, Is.EqualTo(url));
 		}
@@ -53,7 +56,7 @@ namespace LambdaS3FileZipper.Test
 		[Test]
 		public async Task Handle_ShouldRetrieveFilesBasedOnRequest()
 		{
-			await handler.Handle(request);
+			await handler.Handle(request, lambdaContext);
 
 			await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName);
 		}
@@ -61,7 +64,7 @@ namespace LambdaS3FileZipper.Test
 		[Test]
 		public async Task Handle_ShouldCompressFilesRetrieved()
 		{
-			await handler.Handle(request);
+			await handler.Handle(request, lambdaContext);
 
 			await fileZipper.Received().Compress(directory);
 		}
@@ -69,7 +72,7 @@ namespace LambdaS3FileZipper.Test
 		[Test]
 		public async Task Handle_ShouldUploadCompressedFile()
 		{
-			await handler.Handle(request);
+			await handler.Handle(request, lambdaContext);
 
 			await fileUploader.Received().Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile);
 		}
