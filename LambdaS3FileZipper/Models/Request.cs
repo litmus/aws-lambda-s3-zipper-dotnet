@@ -20,9 +20,9 @@ namespace LambdaS3FileZipper.Models
 			DestinationResourceName = destinationResourceName;
 		}
 
-		public string OriginBucketName { get; }
-		public string OriginResourceName { get; }
-		public string DestinationBucketName { get; }
-		public string DestinationResourceName { get; }
+		public string OriginBucketName { get; set; }
+		public string OriginResourceName { get; set; }
+		public string DestinationBucketName { get; set; }
+		public string DestinationResourceName { get; set; }
 	}
 }
