@@ -14,8 +14,8 @@ namespace LambdaS3FileZipper
 				throw new IOException($"{localDirectory} does not exist");
 			}
 
-			var directoryName = Path.GetDirectoryName(localDirectory);
-			var zipPath = Path.Combine(localDirectory, $"{directoryName}.zip");
+			var parentDirectoryName = new DirectoryInfo(localDirectory).Name;
+			var zipPath = Path.Combine(Path.GetTempPath(), $"{parentDirectoryName}.zip");
 
 			await Task.Run(() => ZipFile.CreateFromDirectory(localDirectory, zipPath));
 
