@@ -45,7 +45,7 @@ namespace LambdaS3FileZipper.Aws
 					tasks.Add(task);
 				}
 
-			    Task.WaitAll(tasks.ToArray(), cancellationToken);
+			    await Task.WhenAll(tasks.ToArray());
 		    }
 
 		    return downloadPath;
