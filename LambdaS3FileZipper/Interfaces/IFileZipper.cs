@@ -5,6 +5,6 @@ namespace LambdaS3FileZipper.Interfaces
 {
 	public interface IFileZipper
 	{
-		Task<string> Compress(IEnumerable<string> resources);
+		Task<string> Compress(string localDirectory);
 	}
 }

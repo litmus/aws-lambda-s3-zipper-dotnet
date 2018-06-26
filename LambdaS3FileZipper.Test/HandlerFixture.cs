@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
@@ -16,7 +15,7 @@ namespace LambdaS3FileZipper.Test
 		private IFileUploader fileUploader;
 
 		private Request request;
-		private IEnumerable<string> files;
+		private string directory;
 		private string compressedFile;
 		private string url;
 
@@ -25,17 +24,17 @@ namespace LambdaS3FileZipper.Test
 		{
 			request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource");
 
-			files = new[] {"file-0", "file-1", "file-2", "file-3"};
+			directory = @"/tmp/downloads";
 
 			compressedFile = "compressed-file";
 
 			url = "s3.com/compressed-file";
 
 			fileRetriever = Substitute.For<IFileRetriever>();
-			fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName).Returns(files);
+			fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName).Returns(directory);
 
 			fileZipper = Substitute.For<IFileZipper>();
-			fileZipper.Compress(files).Returns(compressedFile);
+			fileZipper.Compress(directory).Returns(compressedFile);
 
 			fileUploader = Substitute.For<IFileUploader>();
 			fileUploader.Upload(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>()).Returns(url);
@@ -64,7 +63,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await handler.Handle(request);
 
-			await fileZipper.Received().Compress(files);
+			await fileZipper.Received().Compress(directory);
 		}
 
 		[Test]
