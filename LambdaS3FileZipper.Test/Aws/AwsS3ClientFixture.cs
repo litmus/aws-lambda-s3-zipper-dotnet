@@ -51,5 +51,14 @@ namespace LambdaS3FileZipper.Test.Aws
 
 			await amazonS3.DidNotReceive().PutObjectAsync(Arg.Any<PutObjectRequest>(), canceled);
 		}
+
+		[Test]
+		public void GenerateUrl_ShouldGetPresignedUrl()
+		{
+			client.GenerateUrl(bucket, resource);
+
+			amazonS3.Received().GetPreSignedURL(
+				Arg.Is<GetPreSignedUrlRequest>(request => request.BucketName == bucket && request.Key == resource));
+		}
 	}
 }

@@ -70,9 +70,16 @@ namespace LambdaS3FileZipper.Aws
 			await client.PutObjectAsync(request, token);
 		}
 
-		public Task<string> GenerateUrl(string bucketName, string resourceName)
+		public string GenerateUrl(string bucketName, string resourceName)
 		{
-			throw new NotImplementedException();
+			var request = new GetPreSignedUrlRequest
+			{
+				BucketName = bucketName,
+				Key = resourceName,
+				Expires = DateTime.UtcNow.Add(TimeSpan.FromHours(12))
+			};
+
+			return client.GetPreSignedURL(request);
 		}
 	}
 }
