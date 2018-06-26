@@ -30,11 +30,11 @@ namespace LambdaS3FileZipper.Aws
 			    {
 				    await semaphore.WaitAsync(cancellationToken);
 
-				    var task = Task.Factory.StartNew(() =>
+				    var task = Task.Factory.StartNew(async () =>
 				    {
 					    try
 					    {
-						    s3Client.Download(bucket, file, downloadPath, cancellationToken);
+						    await s3Client.Download(bucket, file, downloadPath, cancellationToken);
 					    }
 					    finally
 					    {
