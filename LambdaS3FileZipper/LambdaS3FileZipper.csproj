@@ -22,5 +22,6 @@
     <PackageReference Include="LibLog" Version="5.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="2.8.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
   </ItemGroup>
 </Project>
