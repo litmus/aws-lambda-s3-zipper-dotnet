@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,26 @@ namespace LambdaS3FileZipper.Aws
 			} while (response.IsTruncated);
 
 			return objects;
+		}
+
+		public async Task Download(string bucketName, string resource, string destinationPath, CancellationToken cancellationToken)
+		{
+			if (File.Exists(destinationPath))
+			{
+				throw new IOException($"{destinationPath} already exists");
+			}
+
+			var request = new GetObjectRequest
+			{
+				BucketName = bucketName,
+				Key = resource
+			};
+
+			using (var response = await client.GetObjectAsync(request, cancellationToken))
+			using (var fileStream = File.OpenWrite(destinationPath))
+			{
+				await response.ResponseStream.CopyToAsync(fileStream);
+			}	
 		}
 
 		public Task Upload(string bucketName, string resourceName, string localFile, CancellationToken cancellationToken)
