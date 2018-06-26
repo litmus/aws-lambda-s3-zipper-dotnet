@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
+using Amazon.S3;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.IntegrationTests.Aws;
 using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
@@ -19,7 +20,8 @@ namespace LambdaS3FileZipper.IntegrationTests
 
 		public S3FileRetrieverFixture()
 		{
-			fileRetriever = new S3FileRetriever(new AwsS3Client(RegionEndpoint.USEast1));
+			var s3Client = new AwsS3Client(new AmazonS3Client(RegionEndpoint.USEast1));
+			fileRetriever = new S3FileRetriever(s3Client);
 			testEnvironment = new EnvironmentVariableS3TestEnvironment();
 			log = LogProvider.GetCurrentClassLogger();
 		}
