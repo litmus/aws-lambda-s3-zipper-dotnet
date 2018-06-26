@@ -24,21 +24,21 @@ namespace LambdaS3FileZipper.IntegrationTests
 			log = LogProvider.GetCurrentClassLogger();
 		}
 
-	    [Test]
-	    public async Task Retrieve_ShouldDownloadAllFiles()
-	    {
-		    var directory = await fileRetriever.Retrieve(testEnvironment.TestBucket, "", CancellationToken.None);
+		[Test]
+		public async Task Retrieve_ShouldDownloadAllFiles()
+		{
+			var directory = await fileRetriever.Retrieve(testEnvironment.TestBucket, "", CancellationToken.None);
 
 			Assert.IsTrue(Directory.Exists(directory));
 
-		    try
-		    {
-			    File.Delete(directory);
-		    }
-		    catch
-		    {
+			try
+			{
+				File.Delete(directory);
+			}
+			catch
+			{
 				log.Warn("Could not delete {Directory}", directory);
-		    }
-	    }
-    }
+			}
+		}
+	}
 }
