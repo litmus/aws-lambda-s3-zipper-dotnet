@@ -41,7 +41,7 @@ namespace LambdaS3FileZipper.Test.Aws
 	    {
 		    await uploader.Upload(bucket, resource, compressedFile, regular);
 
-		    await client.Received().GenerateUrl(bucket, resource);
+		    client.Received().GenerateUrl(bucket, resource);
 	    }
 
 	    [Test]
