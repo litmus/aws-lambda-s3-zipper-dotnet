@@ -70,5 +70,10 @@ namespace LambdaS3FileZipper.Aws
 		{
 			throw new NotImplementedException();
 		}
+
+		public Task<string> GenerateUrl(string bucketName, string resourceName)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
