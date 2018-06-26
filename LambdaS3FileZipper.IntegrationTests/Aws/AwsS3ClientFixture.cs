@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
+using Amazon.S3;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
 using LambdaS3FileZipper.IntegrationTests.Logging;
@@ -12,12 +13,13 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 	[TestFixture]
 	public class AwsS3ClientFixture
 	{
-		private static readonly AwsS3Client client = new AwsS3Client(RegionEndpoint.USEast1);
+		private readonly AwsS3Client client;
 		private readonly IS3TestEnvironment testEnvironment;
 		private readonly ILog log;
 
 		public AwsS3ClientFixture()
 		{
+			client = new AwsS3Client(new AmazonS3Client(RegionEndpoint.USEast1));
 			testEnvironment = new EnvironmentVariableS3TestEnvironment();
 			log = LogProvider.GetCurrentClassLogger();
 		}
