@@ -9,7 +9,7 @@ namespace LambdaS3FileZipper
     {
 	    Task<IEnumerable<string>> List(string bucketName, string resource, CancellationToken cancellationToken);
 	    Task Download(string bucketName, string resource, string destinationPath, CancellationToken cancellationToken);
-	    Task Upload(string bucketName, string resourceName, string localFile, CancellationToken cancellationToken);
+	    Task Upload(string bucketName, string resourceName, string filePath, CancellationToken token);
 	    Task<string> GenerateUrl(string bucketName, string resourceName);
     }
 }
