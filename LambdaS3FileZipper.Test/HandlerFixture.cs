@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
@@ -38,7 +40,7 @@ namespace LambdaS3FileZipper.Test
 			fileZipper.Compress(directory).Returns(compressedFile);
 
 			fileUploader = Substitute.For<IFileUploader>();
-			fileUploader.Upload(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>()).Returns(url);
+			fileUploader.Upload(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(url);
 
 			handler = new Handler(fileRetriever, fileZipper, fileUploader);
 
@@ -74,7 +76,9 @@ namespace LambdaS3FileZipper.Test
 		{
 			await handler.Handle(request, lambdaContext);
 
-			await fileUploader.Received().Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile);
+			await fileUploader
+				.Received()
+				.Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile, CancellationToken.None);
 		}
 	}
 }

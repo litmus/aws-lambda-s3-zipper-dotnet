@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
@@ -33,7 +35,9 @@ namespace LambdaS3FileZipper
 			var compressedFileName = await fileZipper.Compress(directory);
 			log.Debug("Compressed file to {CompressedFileName}", compressedFileName);
 			
-			var url = await fileUploader.Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFileName);
+      var url = await fileUploader.Upload(
+				request.DestinationBucketName, request.DestinationResourceName, compressedFileName, CancellationToken.None);
+
             log.Debug("Uploaded file to {Url}", url);
 
             log.Trace("Completed zip request {AwsRequestId} in {ElapsedMilliseconds} ms", lambdaContext.AwsRequestId, sw.ElapsedMilliseconds);
