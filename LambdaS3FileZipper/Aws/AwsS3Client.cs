@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -14,12 +13,9 @@ namespace LambdaS3FileZipper.Aws
 	{
 		private readonly IAmazonS3 client;
 
-		public RegionEndpoint RegionEndpoint { get; }
-
-		public AwsS3Client(RegionEndpoint regionEndpoint)
+		public AwsS3Client(IAmazonS3 client)
 		{
-			RegionEndpoint = regionEndpoint;
-			client = new AmazonS3Client(regionEndpoint);
+			this.client = client;
 		}
 
 		public async Task<IEnumerable<string>> List(string bucketName, string resource, CancellationToken cancellationToken)
@@ -75,14 +71,24 @@ namespace LambdaS3FileZipper.Aws
 			return localPath;
 		}
 
-		public Task Upload(string bucketName, string resourceName, string localFile, CancellationToken cancellationToken)
+		public async Task Upload(string bucketName, string resourceName, string filePath, CancellationToken token)
 		{
-			throw new NotImplementedException();
+			token.ThrowIfCancellationRequested();
+
+			var request = new PutObjectRequest {BucketName = bucketName, Key = resourceName, FilePath = filePath};
+			await client.PutObjectAsync(request, token);
 		}
 
-		public Task<string> GenerateUrl(string bucketName, string resourceName)
+		public string GenerateUrl(string bucketName, string resourceName)
 		{
-			throw new NotImplementedException();
+			var request = new GetPreSignedUrlRequest
+			{
+				BucketName = bucketName,
+				Key = resourceName,
+				Expires = DateTime.UtcNow.Add(TimeSpan.FromHours(12))
+			};
+
+			return client.GetPreSignedURL(request);
 		}
 	}
 }
