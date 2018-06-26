@@ -66,9 +66,10 @@ namespace LambdaS3FileZipper.Aws
 			}	
 		}
 
-		public Task Upload(string bucketName, string resourceName, string localFile, CancellationToken cancellationToken)
+		public async Task Upload(string bucketName, string resourceName, string filePath, CancellationToken token)
 		{
-			throw new NotImplementedException();
+			var request = new PutObjectRequest {BucketName = bucketName, Key = resourceName, FilePath = filePath};
+			await client.PutObjectAsync(request, token);
 		}
 
 		public Task<string> GenerateUrl(string bucketName, string resourceName)
