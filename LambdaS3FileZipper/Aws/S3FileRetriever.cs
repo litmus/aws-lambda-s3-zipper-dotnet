@@ -21,7 +21,7 @@ namespace LambdaS3FileZipper.Aws
 	    {
 		    var files = await s3Client.List(bucket, resource, cancellationToken);
 
-		    var downloadPath = Path.GetTempPath();
+		    var downloadPath = Path.Combine(Path.GetTempPath(), bucket);
 			
 		    using (var semaphore = new SemaphoreSlim(MaxConcurrentDownloads))
 		    {
