@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace LambdaS3FileZipper.Test.Aws
 {
 	[TestFixture]
-    public class AwsS3ClientFixture
+	public class AwsS3ClientFixture
 	{
 		private IAmazonS3 amazonS3;
 
@@ -21,11 +21,11 @@ namespace LambdaS3FileZipper.Test.Aws
 		private CancellationToken regular;
 
 		[SetUp]
-	    public void SetUp()
-	    {
-		    bucket = "bucket";
-		    resource = "resource";
-		    file = "compressed-file";
+		public void SetUp()
+		{
+			bucket = "bucket";
+			resource = "resource";
+			file = "compressed-file";
 
 			amazonS3 = Substitute.For<IAmazonS3>();
 
