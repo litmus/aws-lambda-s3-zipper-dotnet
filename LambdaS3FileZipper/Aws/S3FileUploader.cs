@@ -19,7 +19,7 @@ namespace LambdaS3FileZipper.Aws
 			token.ThrowIfCancellationRequested();
 
 		    await client.Upload(bucketName, resourceName, compressedFileName, token);
-		    return await client.GenerateUrl(bucketName, resourceName);
+		    return client.GenerateUrl(bucketName, resourceName);
 	    }
     }
 }

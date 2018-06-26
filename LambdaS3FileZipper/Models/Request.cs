@@ -2,6 +2,12 @@ namespace LambdaS3FileZipper.Models
 {
 	public class Request
 	{
+        // Empty constructor required for serialization
+        public Request()
+        {
+
+        }
+
 		public Request(
 			string originBucketName,
 			string originResourceName,
