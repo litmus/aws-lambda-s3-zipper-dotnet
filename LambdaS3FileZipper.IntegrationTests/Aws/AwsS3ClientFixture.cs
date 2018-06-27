@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
@@ -28,6 +29,7 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		public async Task List_ShouldReturnObjects()
 		{
 			var result = await client.List(testEnvironment.TestBucket, "", CancellationToken.None);
+			Assert.True(result.Any());
 		}
 
 		[Test]
