@@ -6,6 +6,6 @@ namespace LambdaS3FileZipper.Interfaces
 {
 	public interface IHandler
 	{
-		Task<Response> Handle(Request request, ILambdaContext lambdaContext);
+		Task<Response> Handle(Request request, ILambdaContext context);
 	}
 }
