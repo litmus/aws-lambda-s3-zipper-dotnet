@@ -17,6 +17,11 @@ namespace LambdaS3FileZipper
 			var parentDirectoryName = new DirectoryInfo(localDirectory).Name;
 			var zipPath = Path.Combine(Path.GetTempPath(), $"{parentDirectoryName}.zip");
 
+			if (File.Exists(zipPath))
+			{
+				File.Delete(zipPath);
+			}
+
 			await Task.Run(() => ZipFile.CreateFromDirectory(localDirectory, zipPath));
 
 			return zipPath;

@@ -22,7 +22,12 @@ namespace LambdaS3FileZipper.Aws
 		    var files = await s3Client.List(bucket, resource, cancellationToken);
 
 		    var downloadPath = Path.Combine(Path.GetTempPath(), bucket);
-			
+
+		    if (Directory.Exists(downloadPath))
+		    {
+				Directory.Delete(downloadPath, recursive: true);
+		    }
+
 		    using (var semaphore = new SemaphoreSlim(MaxConcurrentDownloads))
 		    {
 			    var tasks = new List<Task>();
