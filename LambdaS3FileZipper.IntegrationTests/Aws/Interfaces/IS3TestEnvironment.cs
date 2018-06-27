@@ -4,5 +4,8 @@
 	{
 		string TestBucket { get; }
 		string TestObject { get; }
+
+		string OriginTestBucket { get; }
+		string DestinationTestBucket { get; }
 	}
 }
