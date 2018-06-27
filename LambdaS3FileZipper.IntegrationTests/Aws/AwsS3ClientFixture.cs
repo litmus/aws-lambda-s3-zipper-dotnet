@@ -1,49 +1,71 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon;
-using Amazon.S3;
-using LambdaS3FileZipper.Aws;
-using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
-using LambdaS3FileZipper.IntegrationTests.Logging;
 using NUnit.Framework;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws
 {
 	[TestFixture]
-	public class AwsS3ClientFixture
+	public class AwsS3ClientFixture : S3Fixture
 	{
-		private readonly AwsS3Client client;
-		private readonly IS3TestEnvironment testEnvironment;
-		private readonly ILog log;
-
-		public AwsS3ClientFixture()
-		{
-			client = new AwsS3Client(new AmazonS3Client(RegionEndpoint.USEast1));
-			testEnvironment = new EnvironmentVariableS3TestEnvironment();
-			log = LogProvider.GetCurrentClassLogger();
-		}
-
 		[Test]
 		public async Task List_ShouldReturnObjects()
 		{
-			var result = await client.List(testEnvironment.TestBucket, "", CancellationToken.None);
+			var result = await Client.List(TestEnvironment.TestBucket, "", CancellationToken.None);
+			Assert.True(result.Any());
 		}
 
 		[Test]
 		public async Task Download_ShouldRetrieveObject()
 		{
-			var localPath = await client.Download(testEnvironment.TestBucket, testEnvironment.TestObject, Path.GetTempPath(), CancellationToken.None);
+			var localPath = await Client.Download(TestEnvironment.TestBucket, TestEnvironment.TestObject, Path.GetTempPath(), CancellationToken.None);
 
 			Assert.True(File.Exists(localPath));
 
+			DeleteLocalTempFile(localPath);
+		}
+
+		[Test]
+		public async Task Upload_ShouldSaveFile()
+		{
+			const string testFileName = "uploadTest.txt";
+			var localTestFile = Path.Combine(Path.GetTempPath(), testFileName);
+
 			try
 			{
-				File.Delete(localPath);
+				await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
+
+				await Client.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
 			}
-			catch
+			finally
 			{
-				log.Warn("Could not delete {File}", localPath);
+				DeleteLocalTempFile(localTestFile);
+				await DeleteTempS3Object(TestEnvironment.TestBucket, testFileName);
+			}
+		}
+
+		[Test]
+		public async Task Delete_ShouldRemoveObject()
+		{
+			const string testFileName = "uploadTest.txt";
+			var localTestFile = Path.Combine(Path.GetTempPath(), testFileName);
+
+			try
+			{
+				await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
+
+				await Client.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
+
+				Assert.DoesNotThrowAsync(() => Client.Delete(TestEnvironment.TestBucket, testFileName, CancellationToken.None));
+
+				var objects = await Client.List(TestEnvironment.TestBucket, "", CancellationToken.None);
+				Assert.False(objects.Contains(testFileName));
+			}
+			finally
+			{
+				DeleteLocalTempFile(localTestFile);
+				await DeleteTempS3Object(TestEnvironment.TestBucket, testFileName);
 			}
 		}
 	}
