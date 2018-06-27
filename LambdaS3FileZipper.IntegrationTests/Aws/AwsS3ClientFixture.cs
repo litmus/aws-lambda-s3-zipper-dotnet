@@ -37,13 +37,32 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 
 			Assert.True(File.Exists(localPath));
 
+			DeleteTempFile(localPath);
+		}
+
+		[Test]
+		public async Task Upload_ShouldSaveFile()
+		{
+			var localTestFile = Path.Combine(Path.GetTempPath(), "uploadTest.txt");
+			await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
+
+			await client.Upload(testEnvironment.TestBucket, "uploadTest.txt", localTestFile, CancellationToken.None);
+
+			DeleteTempFile(localTestFile);
+		}
+
+		private void DeleteTempFile(string tempFile)
+		{
 			try
 			{
-				File.Delete(localPath);
+				if (File.Exists(tempFile))
+				{
+					File.Delete(tempFile);
+				}
 			}
 			catch
 			{
-				log.Warn("Could not delete {File}", localPath);
+				log.Warn("Could not delete {File}", tempFile);
 			}
 		}
 	}
