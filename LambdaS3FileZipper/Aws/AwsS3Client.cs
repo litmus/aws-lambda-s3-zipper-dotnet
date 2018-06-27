@@ -71,14 +71,21 @@ namespace LambdaS3FileZipper.Aws
 			return localPath;
 		}
 
-		public async Task Upload(string bucketName, string resourceName, string filePath, CancellationToken token)
+		public async Task Upload(string bucketName, string resourceName, string filePath, CancellationToken cancellationToken)
 		{
-			token.ThrowIfCancellationRequested();
+			cancellationToken.ThrowIfCancellationRequested();
 
 			var request = new PutObjectRequest {BucketName = bucketName, Key = resourceName, FilePath = filePath};
-			await client.PutObjectAsync(request, token);
+			await client.PutObjectAsync(request, cancellationToken);
 		}
 
+		public async Task Delete(string bucketName, string resourceName, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var request = new DeleteObjectRequest {BucketName = bucketName, Key = resourceName};
+			await client.DeleteObjectAsync(request, cancellationToken);
+		}
 		public string GenerateUrl(string bucketName, string resourceName)
 		{
 			var request = new GetPreSignedUrlRequest

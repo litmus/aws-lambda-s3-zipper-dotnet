@@ -29,12 +29,28 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		[Test]
 		public async Task Upload_ShouldSaveFile()
 		{
-			var localTestFile = Path.Combine(Path.GetTempPath(), "uploadTest.txt");
+			const string testFileName = "uploadTest.txt";
+			var localTestFile = Path.Combine(Path.GetTempPath(), testFileName);
 			await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
 
-			await Client.Upload(TestEnvironment.TestBucket, "uploadTest.txt", localTestFile, CancellationToken.None);
+			await Client.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
 
 			DeleteLocalTempFile(localTestFile);
+		}
+
+		[Test]
+		public async Task Delete_ShouldRemoveObject()
+		{
+			const string testFileName = "uploadTest.txt";
+			var localTestFile = Path.Combine(Path.GetTempPath(), testFileName);
+			await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
+
+			await Client.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
+
+			Assert.DoesNotThrowAsync(() => Client.Delete(TestEnvironment.TestBucket, testFileName, CancellationToken.None));
+
+			var objects = await Client.List(TestEnvironment.TestBucket, "", CancellationToken.None);
+			Assert.False(objects.Contains(testFileName));
 		}
 	}
 }
