@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Amazon;
 using Amazon.S3;
 using LambdaS3FileZipper.Aws;
@@ -49,6 +51,18 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 			catch
 			{
 				Log.Warn("Could not delete {File}", tempFile);
+			}
+		}
+
+		protected async Task DeleteTempS3Object(string bucket, string resourceName)
+		{
+			try
+			{
+				await Client.Delete(bucket, resourceName, CancellationToken.None);
+			}
+			catch
+			{
+				Log.Warn("Could not delete S3 object {ResourceName}", resourceName);
 			}
 		}
 	}

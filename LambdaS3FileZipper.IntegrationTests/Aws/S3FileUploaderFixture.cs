@@ -20,14 +20,23 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		[Test]
 		public async Task Upload_ShouldSaveResource()
 		{
-			var localTestFile = Path.Combine(Path.GetTempPath(), "uploadTest.txt");
-			await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
+			const string testFileName = "uploadTest.txt";
+			var localTestFile = Path.Combine(Path.GetTempPath(), testFileName);
 
-			var result = await fileUploader.Upload(TestEnvironment.TestBucket, "uploadTest.txt", localTestFile,
-				CancellationToken.None);
+			try
+			{
+				await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
+				
+				var result = await fileUploader.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
 
-			Assert.NotNull(result);
-			Assert.True(Uri.TryCreate(result, UriKind.Absolute, out var uri));
+				Assert.NotNull(result);
+				Assert.True(Uri.TryCreate(result, UriKind.Absolute, out var uri));
+			}
+			finally
+			{
+				DeleteLocalTempFile(localTestFile);
+				await DeleteTempS3Object(TestEnvironment.TestBucket, testFileName);
+			}
 		}
 	}
 }

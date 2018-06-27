@@ -43,14 +43,23 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		{
 			const string testFileName = "uploadTest.txt";
 			var localTestFile = Path.Combine(Path.GetTempPath(), testFileName);
-			await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
 
-			await Client.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
+			try
+			{
+				await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
 
-			Assert.DoesNotThrowAsync(() => Client.Delete(TestEnvironment.TestBucket, testFileName, CancellationToken.None));
+				await Client.Upload(TestEnvironment.TestBucket, testFileName, localTestFile, CancellationToken.None);
 
-			var objects = await Client.List(TestEnvironment.TestBucket, "", CancellationToken.None);
-			Assert.False(objects.Contains(testFileName));
+				Assert.DoesNotThrowAsync(() => Client.Delete(TestEnvironment.TestBucket, testFileName, CancellationToken.None));
+
+				var objects = await Client.List(TestEnvironment.TestBucket, "", CancellationToken.None);
+				Assert.False(objects.Contains(testFileName));
+			}
+			finally
+			{
+				DeleteLocalTempFile(localTestFile);
+				await DeleteTempS3Object(TestEnvironment.TestBucket, testFileName);
+			}
 		}
 	}
 }
