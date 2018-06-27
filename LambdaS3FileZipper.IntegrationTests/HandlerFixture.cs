@@ -31,7 +31,7 @@ namespace LambdaS3FileZipper.IntegrationTests
 			var request = new Request
 			{
 				OriginBucketName = TestEnvironment.OriginTestBucket,
-				OriginResourceName = "",
+				OriginResourceName = "000069dc-8635-4f29-af09-e5265f24e049/results",
 				DestinationBucketName = TestEnvironment.DestinationTestBucket,
 				DestinationResourceName = "integration-test.zip"
 			};
