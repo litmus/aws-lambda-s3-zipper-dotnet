@@ -26,7 +26,7 @@ namespace LambdaS3FileZipper.IntegrationTests
 		}
 
 		[Test]
-		public async Task Handle_ShouldCreateZipFil()
+		public async Task Handle_ShouldCreateZipFile()
 		{
 			var request = new Request
 			{
