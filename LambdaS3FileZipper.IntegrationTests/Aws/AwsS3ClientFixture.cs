@@ -2,44 +2,28 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon;
-using Amazon.S3;
-using LambdaS3FileZipper.Aws;
-using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
-using LambdaS3FileZipper.IntegrationTests.Logging;
 using NUnit.Framework;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws
 {
 	[TestFixture]
-	public class AwsS3ClientFixture
+	public class AwsS3ClientFixture : S3Fixture
 	{
-		private readonly AwsS3Client client;
-		private readonly IS3TestEnvironment testEnvironment;
-		private readonly ILog log;
-
-		public AwsS3ClientFixture()
-		{
-			client = new AwsS3Client(new AmazonS3Client(RegionEndpoint.USEast1));
-			testEnvironment = new EnvironmentVariableS3TestEnvironment();
-			log = LogProvider.GetCurrentClassLogger();
-		}
-
 		[Test]
 		public async Task List_ShouldReturnObjects()
 		{
-			var result = await client.List(testEnvironment.TestBucket, "", CancellationToken.None);
+			var result = await Client.List(TestEnvironment.TestBucket, "", CancellationToken.None);
 			Assert.True(result.Any());
 		}
 
 		[Test]
 		public async Task Download_ShouldRetrieveObject()
 		{
-			var localPath = await client.Download(testEnvironment.TestBucket, testEnvironment.TestObject, Path.GetTempPath(), CancellationToken.None);
+			var localPath = await Client.Download(TestEnvironment.TestBucket, TestEnvironment.TestObject, Path.GetTempPath(), CancellationToken.None);
 
 			Assert.True(File.Exists(localPath));
 
-			DeleteTempFile(localPath);
+			DeleteLocalTempFile(localPath);
 		}
 
 		[Test]
@@ -48,24 +32,9 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 			var localTestFile = Path.Combine(Path.GetTempPath(), "uploadTest.txt");
 			await File.WriteAllTextAsync(localTestFile, "upload test", CancellationToken.None);
 
-			await client.Upload(testEnvironment.TestBucket, "uploadTest.txt", localTestFile, CancellationToken.None);
+			await Client.Upload(TestEnvironment.TestBucket, "uploadTest.txt", localTestFile, CancellationToken.None);
 
-			DeleteTempFile(localTestFile);
-		}
-
-		private void DeleteTempFile(string tempFile)
-		{
-			try
-			{
-				if (File.Exists(tempFile))
-				{
-					File.Delete(tempFile);
-				}
-			}
-			catch
-			{
-				log.Warn("Could not delete {File}", tempFile);
-			}
+			DeleteLocalTempFile(localTestFile);
 		}
 	}
 }
