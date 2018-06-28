@@ -6,6 +6,7 @@
 		string TestObject { get; }
 
 		string OriginTestBucket { get; }
+		string OriginTestResourceName { get; }
 		string DestinationTestBucket { get; }
 	}
 }

@@ -8,6 +8,7 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		private const string TestBucketEnvironmentVariable = "S3TestBucket";
 		private const string TestObjectEnvironmentVariable = "S3TestObject";
 		private const string OriginTestBucketEnvironmentVariable = "OriginS3TestBucket";
+		private const string OriginTestResourceNameEnvironmentVariable = "OriginS3TestResourceName";
 		private const string DestinationTestBucketEnvironmentVariable = "DestinationS3TestBucket";
 
 		private string testBucket;
@@ -66,6 +67,25 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 				}
 
 				return originTestBucket;
+			}
+		}
+
+		private string originTestResourceName;
+		public string OriginTestResourceName
+		{
+			get
+			{
+				if (originTestResourceName == null)
+				{
+					originTestResourceName = Environment.GetEnvironmentVariable(OriginTestResourceNameEnvironmentVariable);
+
+					if (originTestResourceName == null)
+					{
+						throw new Exception($"missing required environment variable {OriginTestResourceNameEnvironmentVariable}");
+					}
+				}
+
+				return originTestResourceName;
 			}
 		}
 
