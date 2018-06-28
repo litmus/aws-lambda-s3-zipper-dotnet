@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
@@ -34,7 +35,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await handler.Handle(request, context);
 
-			await service.Received().Process(request);
+			await service.Received().Process(request, Arg.Any<CancellationToken>());
 		}
     }
 }
