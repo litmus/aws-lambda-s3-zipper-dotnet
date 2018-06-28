@@ -21,7 +21,7 @@ namespace LambdaS3FileZipper.Test
 		[SetUp]
 	    public void SetUp()
 	    {
-		    request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource");
+		    request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource", flatZipFile: true);
 
 		    context = Substitute.For<ILambdaContext>();
 

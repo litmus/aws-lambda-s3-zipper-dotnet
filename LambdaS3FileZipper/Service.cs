@@ -26,7 +26,7 @@ namespace LambdaS3FileZipper
 		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, cancellationToken);
 		    log.Debug("Retrieved files from {Bucket}:{Resource}", request.OriginBucketName, request.OriginResourceName);
 
-		    var compressedFileName = await fileZipper.Compress(directory);
+		    var compressedFileName = await fileZipper.Compress(directory, flat: request.FlatZipFile);
 		    log.Debug("Compressed file to {CompressedFileName}", compressedFileName);
 
 		    var url = await fileUploader.Upload(
