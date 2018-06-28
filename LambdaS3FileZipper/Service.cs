@@ -23,7 +23,7 @@ namespace LambdaS3FileZipper
 
 	    public async Task<Response> Process(Request request)
 	    {
-		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName);
+		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, CancellationToken.None);
 		    log.Debug("Retrieved files from {Bucket}:{Resource}", request.OriginBucketName, request.OriginResourceName);
 
 		    var compressedFileName = await fileZipper.Compress(directory);
