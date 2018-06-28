@@ -19,7 +19,7 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		[Test]
 		public async Task Retrieve_ShouldDownloadAllFiles()
 		{
-			var directory = await fileRetriever.Retrieve(TestEnvironment.TestBucket, "", CancellationToken.None);
+			var directory = await fileRetriever.Retrieve(TestEnvironment.IntegrationTestBucket, "", CancellationToken.None);
 
 			Assert.IsTrue(Directory.Exists(directory));
 

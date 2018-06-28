@@ -2,8 +2,8 @@
 {
 	public interface IS3TestEnvironment
 	{
-		string TestBucket { get; }
-		string TestObject { get; }
+		string IntegrationTestBucket { get; }
+		string IntegrationTestResourceName { get; }
 
 		string OriginTestBucket { get; }
 		string OriginTestResourceName { get; }
