@@ -61,6 +61,7 @@ namespace LambdaS3FileZipper.Aws
 			}
 
 			var localPath = Path.Combine(destinationPath, resource);
+			new FileInfo(localPath).Directory.Create();
 
 			using (var response = await client.GetObjectAsync(request, cancellationToken))
 			using (var fileStream = File.OpenWrite(localPath))

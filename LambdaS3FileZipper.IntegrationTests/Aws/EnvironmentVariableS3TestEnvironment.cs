@@ -8,45 +8,46 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		private const string TestBucketEnvironmentVariable = "S3TestBucket";
 		private const string TestObjectEnvironmentVariable = "S3TestObject";
 		private const string OriginTestBucketEnvironmentVariable = "OriginS3TestBucket";
+		private const string OriginTestResourceNameEnvironmentVariable = "OriginS3TestResourceName";
 		private const string DestinationTestBucketEnvironmentVariable = "DestinationS3TestBucket";
 
-		private string testBucket;
+		private string integrationTestBucket;
 
-		public string TestBucket
+		public string IntegrationTestBucket
 		{
 			get
 			{
-				if (testBucket == null)
+				if (integrationTestBucket == null)
 				{
-					testBucket = Environment.GetEnvironmentVariable(TestBucketEnvironmentVariable);
+					integrationTestBucket = Environment.GetEnvironmentVariable(TestBucketEnvironmentVariable);
 
-					if (testBucket == null)
+					if (integrationTestBucket == null)
 					{
 						throw new Exception($"missing required environment variable {TestBucketEnvironmentVariable}");
 					}
 				}
 
-				return testBucket;
+				return integrationTestBucket;
 			}
 		}
 
-		private string testObject;
+		private string integrationTestResourceName;
 
-		public string TestObject
+		public string IntegrationTestResourceName
 		{
 			get
 			{
-				if (testObject == null)
+				if (integrationTestResourceName == null)
 				{
-					testObject = Environment.GetEnvironmentVariable(TestObjectEnvironmentVariable);
+					integrationTestResourceName = Environment.GetEnvironmentVariable(TestObjectEnvironmentVariable);
 
-					if (testObject == null)
+					if (integrationTestResourceName == null)
 					{
 						throw new Exception($"missing required environment variable {TestObjectEnvironmentVariable}");
 					}
 				}
 
-				return testObject;
+				return integrationTestResourceName;
 			}
 		}
 
@@ -66,6 +67,25 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 				}
 
 				return originTestBucket;
+			}
+		}
+
+		private string originTestResourceName;
+		public string OriginTestResourceName
+		{
+			get
+			{
+				if (originTestResourceName == null)
+				{
+					originTestResourceName = Environment.GetEnvironmentVariable(OriginTestResourceNameEnvironmentVariable);
+
+					if (originTestResourceName == null)
+					{
+						throw new Exception($"missing required environment variable {OriginTestResourceNameEnvironmentVariable}");
+					}
+				}
+
+				return originTestResourceName;
 			}
 		}
 
