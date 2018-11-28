@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
@@ -28,7 +29,7 @@ namespace LambdaS3FileZipper
 			var stopwatch = Stopwatch.StartNew();
 			log.Trace("Received zip request {AwsRequestId}, @{Request}", context.AwsRequestId, request);
 
-			var response = await service.Process(request);
+			var response = await service.Process(request, CancellationToken.None);
 
 			log.Trace("Completed zip request {AwsRequestId} in {ElapsedMilliseconds}ms", 
 				context.AwsRequestId, stopwatch.ElapsedMilliseconds);

@@ -21,16 +21,16 @@ namespace LambdaS3FileZipper
 		    this.log = LogProvider.GetCurrentClassLogger();
 	    }
 
-	    public async Task<Response> Process(Request request)
+	    public async Task<Response> Process(Request request, CancellationToken cancellationToken = default(CancellationToken))
 	    {
-		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName);
+		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, cancellationToken);
 		    log.Debug("Retrieved files from {Bucket}:{Resource}", request.OriginBucketName, request.OriginResourceName);
 
-		    var compressedFileName = await fileZipper.Compress(directory);
+		    var compressedFileName = await fileZipper.Compress(directory, flat: request.FlatZipFile);
 		    log.Debug("Compressed file to {CompressedFileName}", compressedFileName);
 
 		    var url = await fileUploader.Upload(
-			    request.DestinationBucketName, request.DestinationResourceName, compressedFileName, CancellationToken.None);
+			    request.DestinationBucketName, request.DestinationResourceName, compressedFileName, cancellationToken);
 		    log.Debug("Uploaded file to {Url}", url);
 
 		    return new Response(url);

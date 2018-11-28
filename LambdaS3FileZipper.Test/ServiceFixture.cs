@@ -24,7 +24,7 @@ namespace LambdaS3FileZipper.Test
 		[SetUp]
 		public void Setup()
 		{
-			request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource");
+			request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource", flatZipFile: true);
 
 			directory = @"/tmp/downloads";
 
@@ -33,10 +33,10 @@ namespace LambdaS3FileZipper.Test
 			url = "s3.com/compressed-file";
 
 			fileRetriever = Substitute.For<IFileRetriever>();
-			fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName).Returns(directory);
+			fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, Arg.Any<CancellationToken>()).Returns(directory);
 
 			fileZipper = Substitute.For<IFileZipper>();
-			fileZipper.Compress(directory).Returns(compressedFile);
+			fileZipper.Compress(directory, Arg.Any<bool>()).Returns(compressedFile);
 
 			fileUploader = Substitute.For<IFileUploader>();
 			fileUploader.Upload(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(url);
@@ -57,7 +57,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await service.Process(request);
 
-			await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName);
+			await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName, Arg.Any<CancellationToken>());
 		}
 
 		[Test]
@@ -65,7 +65,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await service.Process(request);
 
-			await fileZipper.Received().Compress(directory);
+			await fileZipper.Received().Compress(directory, Arg.Any<bool>());
 		}
 
 		[Test]

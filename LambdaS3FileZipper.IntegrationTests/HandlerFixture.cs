@@ -33,7 +33,8 @@ namespace LambdaS3FileZipper.IntegrationTests
 				OriginBucketName = TestEnvironment.OriginTestBucket,
 				OriginResourceName = TestEnvironment.OriginTestResourceName,
 				DestinationBucketName = TestEnvironment.DestinationTestBucket,
-				DestinationResourceName = "integration-test.zip"
+				DestinationResourceName = "integration-test.zip",
+				FlatZipFile = true
 			};
 
 			var context = Substitute.For<ILambdaContext>();

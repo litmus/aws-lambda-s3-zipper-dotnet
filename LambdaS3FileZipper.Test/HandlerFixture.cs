@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
@@ -20,7 +21,7 @@ namespace LambdaS3FileZipper.Test
 		[SetUp]
 	    public void SetUp()
 	    {
-		    request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource");
+		    request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource", flatZipFile: true);
 
 		    context = Substitute.For<ILambdaContext>();
 
@@ -34,7 +35,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await handler.Handle(request, context);
 
-			await service.Received().Process(request);
+			await service.Received().Process(request, Arg.Any<CancellationToken>());
 		}
     }
 }
