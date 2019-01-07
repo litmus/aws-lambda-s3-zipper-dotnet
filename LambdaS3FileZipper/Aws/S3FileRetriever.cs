@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LambdaS3FileZipper.Exceptions;
 using LambdaS3FileZipper.Interfaces;
+using LambdaS3FileZipper.Logging;
 
 namespace LambdaS3FileZipper.Aws
 {
@@ -11,15 +14,23 @@ namespace LambdaS3FileZipper.Aws
 		private const int MaxConcurrentDownloads = 10;
 
 		private readonly IAwsS3Client s3Client;
+		private readonly ILog log;
 
 		public S3FileRetriever(IAwsS3Client s3Client)
 		{
 			this.s3Client = s3Client;
+
+			this.log = LogProvider.GetCurrentClassLogger();
 		}
 
 		public async Task<string> Retrieve(string bucket, string resource, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var files = await s3Client.List(bucket, resource, cancellationToken);
+			if (files.Any() == false)
+			{
+				log.Warn("There are no files listed under {bucket}:{resource}; nothing to ZIP", bucket, resource);
+				throw new ResourceNotFoundException(bucket, resource);
+			}
 
 			var downloadPath = Path.Combine(Path.GetTempPath(), bucket);
 
