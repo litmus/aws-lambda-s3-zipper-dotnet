@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LambdaS3FileZipper.Exceptions;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Logging;
 
@@ -29,7 +29,7 @@ namespace LambdaS3FileZipper.Aws
 			if (files.Any() == false)
 			{
 				log.Warn("There are no files listed under {bucket}:{resource}; nothing to ZIP", bucket, resource);
-				throw new ArgumentException($"There are no files listed under {bucket}:{resource}; nothing to ZIP");
+				throw new ResourceNotFoundException(bucket, resource);
 			}
 
 			var downloadPath = Path.Combine(Path.GetTempPath(), bucket);
