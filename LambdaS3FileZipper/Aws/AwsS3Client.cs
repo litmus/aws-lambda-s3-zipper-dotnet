@@ -25,7 +25,7 @@ namespace LambdaS3FileZipper.Aws
 			var request = new ListObjectsV2Request
 			{
 				BucketName = bucketName,
-				Prefix = resource
+				Prefix = resource,
 			};
 
 			ListObjectsV2Response response;

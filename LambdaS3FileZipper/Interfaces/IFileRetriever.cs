@@ -5,6 +5,6 @@ namespace LambdaS3FileZipper.Interfaces
 {
 	public interface IFileRetriever
 	{
-		Task<string> Retrieve(string bucket, string resource, CancellationToken cancellationToken);
+		Task<string> Retrieve(string bucket, string resource, string resourceExpressionPattern = null, CancellationToken cancellationToken = default);
 	}
 }

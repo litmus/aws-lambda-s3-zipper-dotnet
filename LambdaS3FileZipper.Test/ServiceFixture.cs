@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon.Lambda.Core;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
 using NSubstitute;
@@ -33,7 +31,7 @@ namespace LambdaS3FileZipper.Test
 			url = "s3.com/compressed-file";
 
 			fileRetriever = Substitute.For<IFileRetriever>();
-			fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, Arg.Any<CancellationToken>()).Returns(directory);
+			fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(directory);
 
 			fileZipper = Substitute.For<IFileZipper>();
 			fileZipper.Compress(directory, Arg.Any<bool>()).Returns(compressedFile);
@@ -57,7 +55,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await service.Process(request);
 
-			await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName, Arg.Any<CancellationToken>());
+			await fileRetriever.Received().Retrieve(request.OriginBucketName, request.OriginResourceName);
 		}
 
 		[Test]
