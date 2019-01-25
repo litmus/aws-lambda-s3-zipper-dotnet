@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Aws;
+using LambdaS3FileZipper.Exceptions;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -28,7 +29,7 @@ namespace LambdaS3FileZipper.Test.Aws
 		[Test]
 		public async Task List_ShouldReturnObjectPaths()
 		{
-			var directory = await fileRetriever.Retrieve(testBucket, testResource, CancellationToken.None);
+			var directory = await fileRetriever.Retrieve(testBucket, testResource, cancellationToken: CancellationToken.None);
 
 			Assert.IsNotNull(directory);
 			await s3Client.Received().List(testBucket, testResource, Arg.Any<CancellationToken>());
@@ -38,5 +39,27 @@ namespace LambdaS3FileZipper.Test.Aws
 				await s3Client.Received().Download(testBucket, file, directory, Arg.Any<CancellationToken>());
 			}
 		}
+
+	    [Test]
+	    public async Task List_ShouldReturnEmptyCollectionWhenNoFilesAreFound()
+	    {
+	        testResource = "not-found";
+
+            Assert.ThrowsAsync<ResourceNotFoundException>(() => fileRetriever.Retrieve(testBucket, testResource));
+
+	        await s3Client.Received().List(testBucket, testResource, Arg.Any<CancellationToken>());
+	        await s3Client.DidNotReceive().Download(testBucket, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+	    }
+
+        [Test]
+	    public async Task List_ShouldReturnEmptyCollectionWhenNoFilesMatchExpression()
+	    {
+	        var resourceMatchExpression = @"^f$";
+
+	        Assert.ThrowsAsync<ResourceNotFoundException>(() => fileRetriever.Retrieve(testBucket, testResource, resourceMatchExpression));
+
+	        await s3Client.Received().List(testBucket, testResource, Arg.Any<CancellationToken>());
+	        await s3Client.DidNotReceive().Download(testBucket, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        }
 	}
 }

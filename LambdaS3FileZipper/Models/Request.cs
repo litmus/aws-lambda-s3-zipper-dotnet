@@ -5,7 +5,6 @@ namespace LambdaS3FileZipper.Models
         // Empty constructor required for serialization
         public Request()
         {
-
         }
 
 		public Request(
@@ -13,13 +12,15 @@ namespace LambdaS3FileZipper.Models
 			string originResourceName,
 			string destinationBucketName,
 			string destinationResourceName,
-			bool flatZipFile)
+			bool flatZipFile,
+			string originResourceExpressionPattern = null)
 		{
 			OriginBucketName = originBucketName;
 			OriginResourceName = originResourceName;
 			DestinationBucketName = destinationBucketName;
 			DestinationResourceName = destinationResourceName;
-			FlatZipFile = flatZipFile;
+		    FlatZipFile = flatZipFile;
+		    OriginResourceExpressionPattern = originResourceExpressionPattern;
 		}
 
 		public string OriginBucketName { get; set; }
@@ -27,5 +28,6 @@ namespace LambdaS3FileZipper.Models
 		public string DestinationBucketName { get; set; }
 		public string DestinationResourceName { get; set; }
 		public bool FlatZipFile { get; set; }
+        public string OriginResourceExpressionPattern { get; set; }
 	}
 }

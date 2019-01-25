@@ -18,12 +18,13 @@ namespace LambdaS3FileZipper
 		    this.fileRetriever = fileRetriever;
 		    this.fileZipper = fileZipper;
 		    this.fileUploader = fileUploader;
+
 		    this.log = LogProvider.GetCurrentClassLogger();
 	    }
 
-	    public async Task<Response> Process(Request request, CancellationToken cancellationToken = default(CancellationToken))
+	    public async Task<Response> Process(Request request, CancellationToken cancellationToken = default)
 	    {
-		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, cancellationToken);
+		    var directory = await fileRetriever.Retrieve(request.OriginBucketName, request.OriginResourceName, request.OriginResourceExpressionPattern, cancellationToken);
 		    log.Debug("Retrieved files from {Bucket}:{Resource} into directory {Directory}",
 		        request.OriginBucketName, request.OriginResourceName, directory);
 

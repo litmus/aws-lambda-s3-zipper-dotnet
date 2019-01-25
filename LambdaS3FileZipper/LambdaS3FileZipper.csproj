@@ -12,6 +12,7 @@
     <FileVersion>1.0.1.0</FileVersion>
     <Version Condition="'$(VersionSuffix)' != ''">1.0.1.$(VersionSuffix)</Version>
     <DefineConstants>LIBLOG_PORTABLE</DefineConstants>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
