@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
+using LambdaS3FileZipper.Extensions;
+using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper.Aws
 {
@@ -72,7 +74,16 @@ namespace LambdaS3FileZipper.Aws
 			return localPath;
 		}
 
-		public async Task Upload(string bucketName, string resourceName, string filePath, CancellationToken cancellationToken)
+        public async Task<FileResponse> Download(string bucketName, string resourceKey, CancellationToken cancellationToken)
+        {
+            var request = new GetObjectRequest {BucketName = bucketName, Key = resourceKey};
+            using (var response = await client.GetObjectAsync(request, cancellationToken))
+            {
+                return new FileResponse(resourceKey, await response.ResponseStream.CopyStreamOntoMemory(cancellationToken));
+            }
+        }
+
+        public async Task Upload(string bucketName, string resourceName, string filePath, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
