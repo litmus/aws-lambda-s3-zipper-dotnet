@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LambdaS3FileZipper.IntegrationTests.Extensions;
 using NUnit.Framework;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws
@@ -32,20 +33,13 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		public async Task Download_ToMemory_ShouldRetrieveObject()
 		{
 			Console.WriteLine("Downloading {0}:{1}", TestEnvironment.IntegrationTestBucket, TestEnvironment.IntegrationTestResourceName);
-			using var fileResource = await Client.Download(TestEnvironment.IntegrationTestBucket, TestEnvironment.IntegrationTestResourceName, CancellationToken.None);
+			using var fileResponse = await Client.Download(TestEnvironment.IntegrationTestBucket, TestEnvironment.IntegrationTestResourceName, CancellationToken.None);
 
-			var localPath = Path.GetTempFileName();
-			using (var fileStream = File.OpenWrite(localPath))
-			{
-				await fileResource.ContentStream.CopyToAsync(fileStream);
-			}
-
+			var localPath = await fileResponse.WriteToTempFile();
 			Console.WriteLine("Downloaded to {0}", localPath);
 			Debugger.Break();
 
-			var localFile = new FileInfo(localPath);
-			Assert.That(localFile.Exists, Is.True);
-			Assert.That(localFile.Length, Is.GreaterThan(0));
+			AssertFileIsValid(localPath);
 
 			DeleteLocalTempFile(localPath);
 		}

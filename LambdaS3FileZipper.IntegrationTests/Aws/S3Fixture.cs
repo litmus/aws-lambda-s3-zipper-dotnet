@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
@@ -64,6 +66,13 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 			{
 				Log.Warn("Could not delete S3 object {ResourceName}", resourceName);
 			}
+		}
+
+		protected void AssertFileIsValid(string filePath)
+		{
+			var file = new FileInfo(filePath);
+			Assert.That(file.Exists, Is.True);
+			Assert.That(file.Length, Is.GreaterThan(0));
 		}
 	}
 }
