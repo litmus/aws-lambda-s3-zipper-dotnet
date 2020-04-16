@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Threading;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Aws;
 using NUnit.Framework;
@@ -19,11 +19,15 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		[Test]
 		public async Task Retrieve_ShouldDownloadAllFiles()
 		{
-			var directory = await fileRetriever.Retrieve(TestEnvironment.IntegrationTestBucket, "test.png", resourceExpressionPattern: ".*");
+			var resourceExpressionPattern = ".*png$";
+			var directoryPath = await fileRetriever.Retrieve(TestEnvironment.IntegrationTestBucket, TestEnvironment.IntegrationTestResourceName, resourceExpressionPattern);
 
-			Assert.IsTrue(Directory.Exists(directory));
+			var directory = new DirectoryInfo(directoryPath);
+			Debugger.Break();
+			Assert.That(directory.Exists);
+			Assert.That(directory.GetFiles(), Is.Not.Empty);
 
-			DeleteLocalTempDirectory(directory);
+			DeleteLocalTempDirectory(directoryPath);
 		}
 	}
 }
