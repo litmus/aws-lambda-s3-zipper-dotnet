@@ -17,10 +17,10 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 		}
 
 		[Test]
-		public async Task Retrieve_ShouldDownloadAllFiles()
+		public async Task RetrieveToLocalDirectory_ShouldDownloadAllFiles()
 		{
 			var resourceExpressionPattern = ".*png$";
-			var directoryPath = await fileRetriever.Retrieve(TestEnvironment.IntegrationTestBucket, TestEnvironment.IntegrationTestResourceName, resourceExpressionPattern);
+			var directoryPath = await fileRetriever.RetrieveToLocalDirectory(TestEnvironment.IntegrationTestBucket, TestEnvironment.IntegrationTestResourceName, resourceExpressionPattern);
 
 			var directory = new DirectoryInfo(directoryPath);
 			Debugger.Break();

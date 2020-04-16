@@ -32,9 +32,9 @@ namespace LambdaS3FileZipper.Test.Aws
 		}
 
 		[Test]
-		public async Task Retrieve_ShouldReturnObjectPaths()
+		public async Task RetrieveToLocalDirectory_ShouldReturnObjectPaths()
 		{
-			var directory = await fileRetriever.Retrieve(testBucket, testResource, cancellationToken: cancellationToken);
+			var directory = await fileRetriever.RetrieveToLocalDirectory(testBucket, testResource, cancellationToken: cancellationToken);
 
 			Assert.IsNotNull(directory);
 			await s3Client.Received(1).List(testBucket, testResource, cancellationToken);
@@ -45,22 +45,22 @@ namespace LambdaS3FileZipper.Test.Aws
 		}
 
 	    [Test]
-	    public async Task Retrieve_ShouldReturnEmptyCollectionWhenNoFilesAreFound()
+	    public async Task RetrieveToLocalDirectory_ShouldReturnEmptyCollectionWhenNoFilesAreFound()
 	    {
 	        testResource = "not-found";
 
-            Assert.ThrowsAsync<ResourceNotFoundException>(() => fileRetriever.Retrieve(testBucket, testResource, cancellationToken: cancellationToken));
+            Assert.ThrowsAsync<ResourceNotFoundException>(() => fileRetriever.RetrieveToLocalDirectory(testBucket, testResource, cancellationToken: cancellationToken));
 
 	        await s3Client.Received(1).List(testBucket, testResource, cancellationToken);
 	        await s3Client.DidNotReceive().Download(testBucket, Arg.Any<string>(), Arg.Any<string>(), cancellationToken);
 	    }
 
         [Test]
-	    public async Task Retrieve_ShouldReturnOnlyFilesMatchingExpression()
+	    public async Task RetrieveToLocalDirectory_ShouldReturnOnlyFilesMatchingExpression()
 	    {
 	        var resourceMatchExpression = @".*2";
 
-	        await fileRetriever.Retrieve(testBucket, testResource, resourceMatchExpression, cancellationToken);
+	        await fileRetriever.RetrieveToLocalDirectory(testBucket, testResource, resourceMatchExpression, cancellationToken);
 
 	        await s3Client.Received(1).List(testBucket, testResource, cancellationToken);
 	        await s3Client.DidNotReceive().Download(testBucket, "file1", Arg.Any<string>(), cancellationToken);
