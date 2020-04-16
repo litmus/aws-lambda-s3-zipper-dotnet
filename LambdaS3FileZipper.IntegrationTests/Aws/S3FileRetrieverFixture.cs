@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Aws;
+using LambdaS3FileZipper.IntegrationTests.Extensions;
 using NUnit.Framework;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws
@@ -29,5 +31,24 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 
 			DeleteLocalTempDirectory(directoryPath);
 		}
+
+		[Test]
+		public async Task RetrieveToMemory_ShouldDownloadAllFiles()
+		{
+			var resourceExpressionPattern = "^test.*png$";
+			var fileResponses = await fileRetriever.RetrieveToMemory(TestEnvironment.IntegrationTestBucket, fileKey: "test", resourceExpressionPattern);
+
+			foreach (var fileResponse in fileResponses)
+			{
+				var localPath = await fileResponse.WriteToTempFile();
+				Console.WriteLine("Downloaded to {0}", localPath);
+				Debugger.Break();
+
+				AssertFileIsValid(localPath);
+
+				DeleteLocalTempFile(localPath);
+			}
+		}
+
 	}
 }

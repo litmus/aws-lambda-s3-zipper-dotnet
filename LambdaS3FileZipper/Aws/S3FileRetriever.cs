@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using LambdaS3FileZipper.Exceptions;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Logging;
+using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper.Aws
 {
@@ -44,9 +46,24 @@ namespace LambdaS3FileZipper.Aws
 			return downloadPath;
 		}
 
+		public async Task<FileResponse[]> RetrieveToMemory(
+			string bucket,
+			string fileKey,
+			string resourceExpressionPattern = default,
+			CancellationToken cancellationToken = default)
+		{
+			var fileKeys = await FindFilesMatchingExpression(bucket, fileKey, resourceExpressionPattern, cancellationToken);
+			var fileResponses = new ConcurrentBag<FileResponse>();
+			await RetrieveConcurrently(
+				fileKeys,
+				retrieveEachFile: async file => fileResponses.Add(await s3Client.Download(bucket, file, cancellationToken)),
+				cancellationToken);
+			return fileResponses.ToArray();
+		}
+
 		private async Task<string[]> FindFilesMatchingExpression(
 			string bucket,
-			string resource,
+			string fileKey,
 			string resourceExpressionPattern = default,
 			CancellationToken cancellationToken = default)
 		{
@@ -54,22 +71,22 @@ namespace LambdaS3FileZipper.Aws
 			log.Debug("Using resource name expression pattern {resourceExpressionPattern}", resourceExpressionPattern);
 
 			var regex = new Regex(resourceExpressionPattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-			var files = (await s3Client.List(bucket, resource, cancellationToken)).Where(file => regex.IsMatch(file)).ToArray();
+			var files = (await s3Client.List(bucket, fileKey, cancellationToken)).Where(file => regex.IsMatch(file)).ToArray();
 			if (files.Any() == false)
 			{
-				log.Warn("No files under {bucket}/{resource} matching {resourceExpressionPattern}", bucket, resource, resourceExpressionPattern);
-				throw new ResourceNotFoundException(bucket, resource, resourceExpressionPattern);
+				log.Warn("No files under {bucket}/{resource} matching {resourceExpressionPattern}", bucket, fileKey, resourceExpressionPattern);
+				throw new ResourceNotFoundException(bucket, fileKey, resourceExpressionPattern);
 			}
 
 			return files;
 		}
 
-		private static async Task RetrieveConcurrently(string[] files, Func<string, Task> retrieveEachFile, CancellationToken cancellationToken)
+		private static async Task RetrieveConcurrently(string[] fileKeys, Func<string, Task> retrieveEachFile, CancellationToken cancellationToken)
 		{
 			using var throttler = new SemaphoreSlim(MaxConcurrentDownloads);
 
 			var tasks = new List<Task>();
-			foreach (var file in files)
+			foreach (var fileKey in fileKeys)
 			{
 				await throttler.WaitAsync(cancellationToken);
 
@@ -77,7 +94,7 @@ namespace LambdaS3FileZipper.Aws
 				{
 					try
 					{
-						await retrieveEachFile(file);
+						await retrieveEachFile(fileKey);
 					}
 					finally
 					{
