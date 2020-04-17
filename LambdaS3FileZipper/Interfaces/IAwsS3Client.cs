@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Models;
 
-namespace LambdaS3FileZipper
+namespace LambdaS3FileZipper.Interfaces
 {
     public interface IAwsS3Client
     {

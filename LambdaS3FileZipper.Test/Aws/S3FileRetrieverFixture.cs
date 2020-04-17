@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.Exceptions;
+using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
 using NSubstitute;
 using NUnit.Framework;

@@ -8,6 +8,7 @@ using Amazon.S3;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
 using LambdaS3FileZipper.IntegrationTests.Logging;
+using LambdaS3FileZipper.Interfaces;
 using NUnit.Framework;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws

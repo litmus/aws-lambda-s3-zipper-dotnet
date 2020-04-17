@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using LambdaS3FileZipper.Extensions;
+using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper.Aws
