@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Extensions;
 using LambdaS3FileZipper.IntegrationTests.Extensions;
-using LambdaS3FileZipper.IntegrationTests.Logging;
 using LambdaS3FileZipper.Models;
 using NUnit.Framework;
+using FileAssert = LambdaS3FileZipper.IntegrationTests.Testing.FileAssert;
 
 namespace LambdaS3FileZipper.IntegrationTests
 {
@@ -55,7 +55,6 @@ namespace LambdaS3FileZipper.IntegrationTests
 			}
 		}
 
-
 		[Test]
 		public async Task Compress_ShouldZipFilesInMemory()
 		{
@@ -78,6 +77,8 @@ namespace LambdaS3FileZipper.IntegrationTests
 				await zipFileResponse.WriteTo(zipFilePath);
 				Console.WriteLine("Created zipFilePath at {0}", zipFilePath);
 				Debugger.Break();
+
+				FileAssert.HasContent(zipFilePath);
 			}
 			finally
 			{
