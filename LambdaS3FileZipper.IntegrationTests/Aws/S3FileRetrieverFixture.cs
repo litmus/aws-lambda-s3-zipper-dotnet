@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.IntegrationTests.Extensions;
 using NUnit.Framework;
+using FileAssert = LambdaS3FileZipper.IntegrationTests.Testing.FileAssert;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws
 {
@@ -44,7 +45,7 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 				Console.WriteLine("Downloaded to {0}", localPath);
 				Debugger.Break();
 
-				AssertFileIsValid(localPath);
+				FileAssert.HasContent(localPath);
 
 				DeleteLocalTempFile(localPath);
 			}
