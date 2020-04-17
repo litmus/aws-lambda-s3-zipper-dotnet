@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Interfaces;
+using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper
 {
@@ -33,6 +35,22 @@ namespace LambdaS3FileZipper
 			}
 			
 			return zipPath;
+		}
+
+		public async Task<FileResponse> Compress(string zipFileKey, IEnumerable<FileResponse> filesResponses, CancellationToken cancellationToken)
+		{
+			var zipStream = new MemoryStream();
+			var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create);
+			foreach (var fileResponse in filesResponses)
+			{
+				var zipEntry = zipArchive.CreateEntry(fileResponse.ResourceKey);
+
+				using var zipEntryStream = zipEntry.Open();
+				using var fileContentStream = fileResponse.ContentStream;
+				await fileContentStream.CopyToAsync(zipEntryStream, 4096, cancellationToken);
+			}
+
+			return new FileResponse(resourceKey: zipFileKey, contentStream: zipStream);
 		}
 
 		private async Task CreateFlatZip(string localDirectory, string zipPath)
