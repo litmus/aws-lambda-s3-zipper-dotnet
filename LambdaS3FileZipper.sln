@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaS3FileZipper", "LambdaS3FileZipper\LambdaS3FileZipper.csproj", "{A87930C6-8082-4760-83BE-272FD39E036D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaS3FileZipper.Test", "LambdaS3FileZipper.Test\LambdaS3FileZipper.Test.csproj", "{21982D49-2F6C-4A11-868D-6B04880C38F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaS3FileZipper.IntegrationTests", "LambdaS3FileZipper.IntegrationTests\LambdaS3FileZipper.IntegrationTests.csproj", "{26165F86-E52F-41BB-97B0-1B24979CB826}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{33D5B0B1-183E-4E17-ABFC-ACA6291061C1}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
