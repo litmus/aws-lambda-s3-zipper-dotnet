@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
+using LambdaS3FileZipper.Extensions;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Models;
 
@@ -50,7 +51,7 @@ namespace LambdaS3FileZipper
 				await fileContentStream.CopyToAsync(zipEntryStream, 4096, cancellationToken);
 			}
 
-			return new FileResponse(resourceKey: zipFileKey, contentStream: zipStream);
+			return new FileResponse(resourceKey: zipFileKey, contentStream: zipStream.Reset());
 		}
 
 		private async Task CreateFlatZip(string localDirectory, string zipPath)
