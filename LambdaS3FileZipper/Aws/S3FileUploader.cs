@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Interfaces;
+using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper.Aws
 {
@@ -14,12 +14,20 @@ namespace LambdaS3FileZipper.Aws
 			this.client = client;
 		}
 
-	    public async Task<string> Upload(string bucket, string fileKey, string compressedFileName, CancellationToken token)
+	    public async Task<string> Upload(string bucket, string fileKey, string compressedFileName, CancellationToken cancellationToken = default)
 	    {
-			token.ThrowIfCancellationRequested();
+			cancellationToken.ThrowIfCancellationRequested();
 
-		    await client.Upload(bucket, fileKey, compressedFileName, token);
+		    await client.Upload(bucket, fileKey, compressedFileName, cancellationToken);
 		    return client.GenerateUrl(bucket, fileKey);
 	    }
-    }
+
+	    public async Task<string> Upload(string bucket, string fileKey, FileResponse fileResponse, CancellationToken cancellationToken = default)
+	    {
+		    cancellationToken.ThrowIfCancellationRequested();
+
+		    await client.Upload(bucket, fileKey, fileResponse, cancellationToken);
+		    return client.GenerateUrl(bucket, fileKey);
+	    }
+	}
 }
