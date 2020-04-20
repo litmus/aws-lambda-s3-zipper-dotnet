@@ -40,18 +40,26 @@ namespace LambdaS3FileZipper
 
 		public async Task<FileResponse> Compress(string zipFileKey, IEnumerable<FileResponse> filesResponses, CancellationToken cancellationToken)
 		{
-			var zipStream = new MemoryStream();
-			var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create);
-			foreach (var fileResponse in filesResponses)
-			{
-				var zipEntry = zipArchive.CreateEntry(fileResponse.ResourceKey);
+			var zipMemoryStream = new MemoryStream();
 
-				using var zipEntryStream = zipEntry.Open();
-				using var fileContentStream = fileResponse.ContentStream;
-				await fileContentStream.CopyToAsync(zipEntryStream, 4096, cancellationToken);
+			// In order to allow consumption of the compressed stream:
+			// (1) leaveOpen => true
+			// (2) ZipArchive object needs to be disposed to prevent compressed stream/ZIP file corruption
+			// (disposing runs a number of required finalizers, while keeping stream open :shrug:)
+			// For more info, visit: https://stackoverflow.com/a/17939367/1250033
+			using (var zipArchive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, leaveOpen: true))
+			{
+				foreach (var fileResponse in filesResponses)
+				{
+					var zipEntry = zipArchive.CreateEntry(fileResponse.ResourceKey);
+
+					using var zipEntryStream = zipEntry.Open();
+					using var fileContentStream = fileResponse.ContentStream;
+					await fileContentStream.CopyToAsync(zipEntryStream, 4096, cancellationToken);
+				}
 			}
 
-			return new FileResponse(resourceKey: zipFileKey, contentStream: zipStream.Reset());
+			return new FileResponse(resourceKey: zipFileKey, contentStream: zipMemoryStream.Reset());
 		}
 
 		private async Task CreateFlatZip(string localDirectory, string zipPath)
