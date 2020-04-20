@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LambdaS3FileZipper.Extensions;
 using LambdaS3FileZipper.IntegrationTests.Extensions;
-using LambdaS3FileZipper.Models;
+using LambdaS3FileZipper.IntegrationTests.Testing;
 using NUnit.Framework;
 using FileAssert = LambdaS3FileZipper.IntegrationTests.Testing.FileAssert;
 
@@ -15,85 +14,62 @@ namespace LambdaS3FileZipper.IntegrationTests
 	[TestFixture]
 	public class FileZipperFixture
 	{
-		private readonly FileZipper fileZipper;
+		private FileZipper fileZipper;
+
+		private string zipFilePath;
+		private string sourceDirectoryName;
+		private string sourceDirectoryPath;
 
 		private CancellationToken cancellationToken;
 
-		public FileZipperFixture()
+		[SetUp]
+		public void SetUp()
 		{
+			sourceDirectoryName = Guid.NewGuid().ToString();
+			sourceDirectoryPath = Path.Combine(Path.GetTempPath(), sourceDirectoryName);
+			Directory.CreateDirectory(sourceDirectoryPath);
+
 			fileZipper = new FileZipper();
 
 			cancellationToken = CancellationToken.None;
 		}
 
+		[TearDown]
+		public void TearDown()
+		{
+			FileTool.TryDeleteFile(zipFilePath);
+			FileTool.TryDeleteDirectory(sourceDirectoryPath);
+		}
+
 		[Test]
 		public async Task Compress_ShouldZipFolder()
 		{
-			var tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-			Directory.CreateDirectory(tempDirectory);
+			var textFilePath = Path.Combine(sourceDirectoryPath, "compress.txt");
+			await File.WriteAllTextAsync(textFilePath, "Compress test.");
 
-			var tempFile = Path.Combine(tempDirectory, "compress.txt");
-			await File.WriteAllTextAsync(tempFile, "Compress test.");
+			zipFilePath = await fileZipper.Compress(sourceDirectoryPath);
 
-			try
-			{
-				var zipFile = await fileZipper.Compress(tempDirectory);
-
-				Assert.True(File.Exists(zipFile));
-			}
-			finally
-			{
-				if (Directory.Exists(tempDirectory))
-				{
-					Directory.Delete(tempDirectory, recursive: true);
-				}
-		
-				if (File.Exists(tempFile))
-				{
-					File.Delete(tempFile);
-				}
-			}
+			FileAssert.Exists(zipFilePath);
 		}
 
 		[Test]
 		public async Task Compress_ShouldZipFilesInMemory()
 		{
-			var tempDirectory = Guid.NewGuid().ToString();
-			var tempDirectoryPath = Path.Combine(Path.GetTempPath(), tempDirectory);
-			Directory.CreateDirectory(tempDirectoryPath);
+			var zipFileKey = $"{sourceDirectoryName}.zip";
+			zipFilePath = Path.Combine(Path.GetTempPath(), zipFileKey);
 
-			var zipFileKey = $"{tempDirectory}.zip";
-			var zipFilePath = Path.Combine(Path.GetTempPath(), zipFileKey);
+			var tempFileNames = new[] {"text-file-0.txt", "text-file-1.txt"};
+			var fileResponses = await Task.WhenAll(tempFileNames
+				.Select(fileName => FileTool.CreateTempTextFile(sourceDirectoryPath, fileName, fileContent: fileName))
+				.ToArray());
 
-			try
-			{
-				var tempFileNames = new[] {"text-file-0.txt", "text-file-1.txt"};
-				var fileResponses = await Task.WhenAll(tempFileNames
-					.Select(fileName => CreateTempTextFile(tempDirectoryPath, fileName, fileContent: fileName))
-					.ToArray());
+			var zipFileResponse = await fileZipper.Compress(zipFileKey, fileResponses, cancellationToken);
 
-				var zipFileResponse = await fileZipper.Compress(zipFileKey, fileResponses, cancellationToken);
+			await zipFileResponse.WriteTo(zipFilePath);
+			Console.WriteLine("Created zipFilePath at {0}", zipFilePath);
+			Debugger.Break();
 
-				await zipFileResponse.WriteTo(zipFilePath);
-				Console.WriteLine("Created zipFilePath at {0}", zipFilePath);
-				Debugger.Break();
-
-				FileAssert.HasContent(zipFilePath);
-			}
-			finally
-			{
-				if (Directory.Exists(tempDirectoryPath)) { Directory.Delete(tempDirectoryPath, recursive: true); }
-				if (File.Exists(zipFilePath)) { File.Delete(zipFilePath); }
-			}
-		}
-
-		private async Task<FileResponse> CreateTempTextFile(string directory, string fileKey, string fileContent)
-		{
-			var filePath = Path.Combine(directory, fileKey);
-			await File.WriteAllTextAsync(filePath, fileContent, cancellationToken);
-
-			using var fileStream = File.OpenRead(filePath);
-			return new FileResponse(resourceKey: fileKey, contentStream: await fileStream.CopyStreamOntoMemory(cancellationToken));
+			FileAssert.HasContent(zipFilePath);
 		}
 	}
 }
