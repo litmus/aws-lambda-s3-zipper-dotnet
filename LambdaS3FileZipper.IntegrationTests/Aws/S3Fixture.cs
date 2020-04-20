@@ -8,6 +8,7 @@ using Amazon.S3;
 using LambdaS3FileZipper.Aws;
 using LambdaS3FileZipper.IntegrationTests.Aws.Interfaces;
 using LambdaS3FileZipper.IntegrationTests.Logging;
+using LambdaS3FileZipper.Interfaces;
 using NUnit.Framework;
 
 namespace LambdaS3FileZipper.IntegrationTests.Aws
@@ -66,13 +67,6 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 			{
 				Log.Warn("Could not delete S3 object {ResourceName}", resourceName);
 			}
-		}
-
-		protected void AssertFileIsValid(string filePath)
-		{
-			var file = new FileInfo(filePath);
-			Assert.That(file.Exists, Is.True);
-			Assert.That(file.Length, Is.GreaterThan(0));
 		}
 	}
 }

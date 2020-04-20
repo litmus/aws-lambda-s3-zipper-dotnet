@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using LambdaS3FileZipper.Extensions;
 using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper.IntegrationTests.Extensions
@@ -18,6 +19,7 @@ namespace LambdaS3FileZipper.IntegrationTests.Extensions
 		{
 			using var fileStream = File.OpenWrite(filePath);
 			await fileResponse.ContentStream.CopyToAsync(fileStream);
+			fileResponse.ContentStream.Reset();
 		}
 	}
 }

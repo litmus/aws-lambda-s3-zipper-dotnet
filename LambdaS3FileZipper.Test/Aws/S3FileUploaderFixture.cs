@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Aws;
+using LambdaS3FileZipper.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
 
