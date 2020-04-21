@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace LambdaS3FileZipper.IntegrationTests.Testing
 {
@@ -32,13 +33,21 @@ namespace LambdaS3FileZipper.IntegrationTests.Testing
 		/// and has at least one file compressed
 		/// </summary>
 		/// <param name="filePath"></param>
-		public static void ZipHasFiles(string filePath)
+		/// <param name="expectedFileCount"></param>
+		public static void ZipHasFiles(string filePath, int? expectedFileCount = default)
 		{
 			HasContent(filePath);
 
 			using var fileStream = File.OpenRead(filePath);
 			using var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
-			Assert.That(zipArchive.Entries, Is.Not.Empty);
+			if (expectedFileCount.HasValue)
+			{
+				Assert.That(zipArchive.Entries.Count, Is.EqualTo(expectedFileCount.Value));
+			}
+			else
+			{
+				Assert.That(zipArchive.Entries, Is.Not.Empty);
+			}
 		}
 	}
 }
