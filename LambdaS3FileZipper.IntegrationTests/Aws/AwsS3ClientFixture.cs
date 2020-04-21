@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.IntegrationTests.Extensions;
+using LambdaS3FileZipper.IntegrationTests.Testing;
 using NUnit.Framework;
 using FileAssert = LambdaS3FileZipper.IntegrationTests.Testing.FileAssert;
 
@@ -61,6 +62,28 @@ namespace LambdaS3FileZipper.IntegrationTests.Aws
 			{
 				DeleteLocalTempFile(localTestFile);
 				await DeleteTempS3Object(TestEnvironment.IntegrationTestBucket, testFileName);
+			}
+		}
+
+		[Test]
+		public async Task Upload_FromMemory_ShouldUploadFileToS3()
+		{
+			var tempDirectory = Path.GetTempPath();
+			var fileKey = Guid.NewGuid().ToString();
+			var fileContent = $"{fileKey}: file was uploaded at {DateTime.UtcNow}";
+			var file = await FileTool.CreateTempTextFile(tempDirectory, fileKey, fileContent);
+			var cancellationToken = CancellationToken.None;
+
+			try
+			{
+				await Client.Upload(TestEnvironment.IntegrationTestBucket, fileKey, file, cancellationToken);
+
+				Debugger.Break();
+			}
+			finally
+			{
+				FileTool.TryDeleteFile(filePath: Path.Combine(tempDirectory, fileKey));
+				await DeleteTempS3Object(TestEnvironment.IntegrationTestBucket, fileKey);
 			}
 		}
 

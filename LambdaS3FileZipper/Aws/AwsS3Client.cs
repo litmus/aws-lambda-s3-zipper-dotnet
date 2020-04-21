@@ -92,7 +92,15 @@ namespace LambdaS3FileZipper.Aws
 			await client.PutObjectAsync(request, cancellationToken);
 		}
 
-		public async Task Delete(string bucketName, string resourceName, CancellationToken cancellationToken)
+        public async Task Upload(string bucketName, string resourceName, FileResponse fileResponse, CancellationToken cancellationToken)
+        {
+	        cancellationToken.ThrowIfCancellationRequested();
+
+	        var request = new PutObjectRequest {BucketName = bucketName, Key = resourceName, InputStream = fileResponse.ContentStream};
+	        await client.PutObjectAsync(request, cancellationToken);
+        }
+
+        public async Task Delete(string bucketName, string resourceName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
