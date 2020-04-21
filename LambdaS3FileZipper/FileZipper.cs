@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Extensions;
@@ -64,32 +65,28 @@ namespace LambdaS3FileZipper
 
 		private async Task CreateFlatZip(string localDirectory, string zipPath)
 		{
-			using (var zipArchive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+			using var zipArchive = ZipFile.Open(zipPath, ZipArchiveMode.Create);
+			foreach (var filePath in GetFilesRecursively(localDirectory))
 			{
-				foreach (var file in GetFiles(localDirectory))
-				{
-					var zipEntry = zipArchive.CreateEntry(Path.GetFileName(file));
+				var zipEntry = zipArchive.CreateEntry(Path.GetFileName(filePath));
 
-					using(var fileReader = File.OpenRead(file))
-					using (var zipStream = zipEntry.Open())
-					{
-						await fileReader.CopyToAsync(zipStream);
-					}
-				}
+				using var fileReader = File.OpenRead(filePath);
+				using var zipStream = zipEntry.Open();
+				await fileReader.CopyToAsync(zipStream);
 			}
 		}
 
-		private IEnumerable<string> GetFiles(string directory)
+		private static IEnumerable<string> GetFilesRecursively(string directory)
 		{
-			var files = new List<string>();
-
-			foreach (var dir in Directory.GetDirectories(directory))
+			foreach (var filePath in Directory.GetFiles(directory))
 			{
-				files.AddRange(Directory.GetFiles(dir));
-				files.AddRange(GetFiles(dir));
+				yield return filePath;
 			}
 
-			return files;
+			foreach (var filePath in Directory.GetDirectories(directory).SelectMany(GetFilesRecursively))
+			{
+				yield return filePath;
+			}
 		}
 	}
 }

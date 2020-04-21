@@ -48,8 +48,26 @@ namespace LambdaS3FileZipper.IntegrationTests
 			await File.WriteAllTextAsync(textFilePath, "Compress test.");
 
 			zipFilePath = await fileZipper.Compress(sourceDirectoryPath);
+			Debugger.Break();
 
 			FileAssert.Exists(zipFilePath);
+			FileAssert.ZipHasFiles(zipFilePath, expectedFileCount: 1);
+		}
+
+		[Test]
+		public async Task Compress_WithFlatEnabled_ShouldZipFolder()
+		{
+			await FileTool.CreateTempTextFile(sourceDirectoryPath, "compress.txt", fileContent: "compress");
+
+			var subDirectoryPath = Path.Combine(sourceDirectoryPath, Guid.NewGuid().ToString());
+			Directory.CreateDirectory(subDirectoryPath);
+			await FileTool.CreateTempTextFile(subDirectoryPath, "compress-sub.txt", fileContent: "compress-sub");
+
+			zipFilePath = await fileZipper.Compress(sourceDirectoryPath, flat: true);
+			Debugger.Break();
+
+			FileAssert.Exists(zipFilePath);
+			FileAssert.ZipHasFiles(zipFilePath, expectedFileCount: 2);
 		}
 
 		[Test]
