@@ -65,18 +65,14 @@ namespace LambdaS3FileZipper
 
 		private async Task CreateFlatZip(string localDirectory, string zipPath)
 		{
-			using (var zipArchive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+			using var zipArchive = ZipFile.Open(zipPath, ZipArchiveMode.Create);
+			foreach (var filePath in GetFilesRecursively(localDirectory))
 			{
-				foreach (var file in GetFilesRecursively(localDirectory))
-				{
-					var zipEntry = zipArchive.CreateEntry(Path.GetFileName(file));
+				var zipEntry = zipArchive.CreateEntry(Path.GetFileName(filePath));
 
-					using(var fileReader = File.OpenRead(file))
-					using (var zipStream = zipEntry.Open())
-					{
-						await fileReader.CopyToAsync(zipStream);
-					}
-				}
+				using var fileReader = File.OpenRead(filePath);
+				using var zipStream = zipEntry.Open();
+				await fileReader.CopyToAsync(zipStream);
 			}
 		}
 
