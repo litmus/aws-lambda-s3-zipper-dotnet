@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -53,6 +54,7 @@ namespace LambdaS3FileZipper.Aws
 			CancellationToken cancellationToken = default)
 		{
 			var fileKeys = await FindFilesMatchingExpression(bucket, fileKey, resourceExpressionPattern, cancellationToken);
+
 			var fileResponses = new ConcurrentBag<FileResponse>();
 			await RetrieveConcurrently(
 				fileKeys,
@@ -81,11 +83,14 @@ namespace LambdaS3FileZipper.Aws
 			return files;
 		}
 
-		private static async Task RetrieveConcurrently(string[] fileKeys, Func<string, Task> retrieveEachFile, CancellationToken cancellationToken)
+		private async Task RetrieveConcurrently(string[] fileKeys, Func<string, Task> retrieveEachFile, CancellationToken cancellationToken)
 		{
 			using var throttler = new SemaphoreSlim(MaxConcurrentDownloads);
 
 			var tasks = new List<Task>();
+			var total = fileKeys.Length;
+			var current = 0;
+
 			foreach (var fileKey in fileKeys)
 			{
 				await throttler.WaitAsync(cancellationToken);
@@ -94,7 +99,12 @@ namespace LambdaS3FileZipper.Aws
 				{
 					try
 					{
+						var stopwatch = Stopwatch.StartNew();
+
 						await retrieveEachFile(fileKey);
+
+						Interlocked.Increment(ref current);
+						log.Trace("Retrieved file {File} ({Current}/{Total}) | {Time}ms", fileKey, current, total, stopwatch.ElapsedMilliseconds);
 					}
 					finally
 					{

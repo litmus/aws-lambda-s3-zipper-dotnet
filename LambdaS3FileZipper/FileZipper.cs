@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -6,12 +7,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Extensions;
 using LambdaS3FileZipper.Interfaces;
+using LambdaS3FileZipper.Logging;
 using LambdaS3FileZipper.Models;
 
 namespace LambdaS3FileZipper
 {
 	public class FileZipper : IFileZipper
 	{
+		private readonly ILog log;
+
+		public FileZipper()
+		{
+			this.log = LogProvider.GetCurrentClassLogger();
+		}
+
 		public async Task<string> Compress(string localDirectory, bool flat = false)
 		{
 			if (!Directory.Exists(localDirectory))
@@ -50,13 +59,20 @@ namespace LambdaS3FileZipper
 			// For more info, visit: https://stackoverflow.com/a/17939367/1250033
 			using (var zipArchive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, leaveOpen: true))
 			{
+				var total = filesResponses.Count();
+				var current = 0;
+
 				foreach (var fileResponse in filesResponses)
 				{
+					var stopwatch = Stopwatch.StartNew();
 					var zipEntry = zipArchive.CreateEntry(fileResponse.ResourceKey);
 
 					using var zipEntryStream = zipEntry.Open();
 					using var fileContentStream = fileResponse.ContentStream;
 					await fileContentStream.CopyToAsync(zipEntryStream, 4096, cancellationToken);
+
+					Interlocked.Increment(ref current);
+					log.Trace("Compressed file {File} ({Current}/{Total}) | {Time}ms", fileResponse.ResourceKey, current, total, stopwatch.ElapsedMilliseconds);
 				}
 			}
 
