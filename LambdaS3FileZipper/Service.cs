@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Interfaces;
 using LambdaS3FileZipper.Logging;
@@ -24,16 +25,18 @@ namespace LambdaS3FileZipper
 
 	    public async Task<Response> Process(Request request, CancellationToken cancellationToken = default)
 	    {
-		    var directory = await fileRetriever.RetrieveToLocalDirectory(request.OriginBucketName, request.OriginResourceName, request.OriginResourceExpressionPattern, cancellationToken);
-		    log.Debug("Retrieved files from {Bucket}:{Resource} into directory {Directory}",
-		        request.OriginBucketName, request.OriginResourceName, directory);
+		    var stopwatch = Stopwatch.StartNew();
 
-		    var compressedFileName = await fileZipper.Compress(directory, flat: request.FlatZipFile);
-		    log.Debug("Compressed file to {CompressedFileName}", compressedFileName);
+		    var files = await fileRetriever.RetrieveToMemory(request.OriginBucketName, request.OriginResourceName, request.OriginResourceExpressionPattern, cancellationToken);
+		    log.Debug("Retrieved files from {Bucket}:{Resource} | {Time}ms", request.OriginBucketName, request.OriginResourceName, stopwatch.ElapsedMilliseconds);
 
-		    var url = await fileUploader.Upload(
-			    request.DestinationBucketName, request.DestinationResourceName, compressedFileName, cancellationToken);
-		    log.Debug("Uploaded file to {Url}", url);
+			stopwatch.Restart();
+		    var compressedFile = await fileZipper.Compress(request.DestinationResourceName, files, cancellationToken);
+		    log.Debug("Compressed files to {CompressedFileName} | {Time}ms", compressedFile.ResourceKey, stopwatch.ElapsedMilliseconds);
+
+			stopwatch.Restart();
+		    var url = await fileUploader.Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile, cancellationToken);
+		    log.Debug("Uploaded file to {Url} | {Time}ms", url, stopwatch.ElapsedMilliseconds);
 
 		    return new Response(url);
 	    }
