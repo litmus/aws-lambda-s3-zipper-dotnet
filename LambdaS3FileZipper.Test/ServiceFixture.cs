@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using LambdaS3FileZipper.Interfaces;
@@ -15,29 +16,41 @@ namespace LambdaS3FileZipper.Test
 		private IFileUploader fileUploader;
 
 		private Request request;
-		private string directory;
-		private string compressedFile;
+		private FileResponse[] files;
+		private string compressedFileKey;
+		private FileResponse compressedFile;
 		private string url;
+		private CancellationToken cancellationToken;
 
 		[SetUp]
 		public void Setup()
 		{
-			request = new Request("origin-bucket", "origin-resource", "destination-bucket", "destination-resource", flatZipFile: true);
+			compressedFileKey = "compressed-file";
 
-			directory = @"/tmp/downloads";
+			request = new Request("origin-bucket", "origin-resource", "destination-bucket", compressedFileKey, flatZipFile: true);
 
-			compressedFile = "compressed-file";
+			files = new []
+			{
+				new FileResponse("file-0", contentStream: new MemoryStream()),
+				new FileResponse("file-1", contentStream: new MemoryStream()),
+				new FileResponse("file-2", contentStream: new MemoryStream()),
+				new FileResponse("file-3", contentStream: new MemoryStream()),
+			};
+
+			compressedFile = new FileResponse(compressedFileKey, contentStream: new MemoryStream());
 
 			url = "s3.com/compressed-file";
 
+			cancellationToken = CancellationToken.None;
+
 			fileRetriever = Substitute.For<IFileRetriever>();
-			fileRetriever.RetrieveToLocalDirectory(request.OriginBucketName, request.OriginResourceName, Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(directory);
+			fileRetriever.RetrieveToMemory(request.OriginBucketName, request.OriginResourceName, Arg.Any<string>(), cancellationToken).Returns(files);
 
 			fileZipper = Substitute.For<IFileZipper>();
-			fileZipper.Compress(directory, Arg.Any<bool>()).Returns(compressedFile);
+			fileZipper.Compress(compressedFileKey, files, cancellationToken).Returns(compressedFile);
 
 			fileUploader = Substitute.For<IFileUploader>();
-			fileUploader.Upload(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(url);
+			fileUploader.Upload("destination-bucket", compressedFileKey, compressedFile, cancellationToken).Returns(url);
 
 			service = new Service(fileRetriever, fileZipper, fileUploader);
 		}
@@ -45,7 +58,7 @@ namespace LambdaS3FileZipper.Test
 		[Test]
 		public async Task Handle_ShouldHandleRequestAndProvideAResponse()
 		{
-			var response = await service.Process(request);
+			var response = await service.Process(request, cancellationToken);
 
 			Assert.That(response.Url, Is.EqualTo(url));
 		}
@@ -53,27 +66,27 @@ namespace LambdaS3FileZipper.Test
 		[Test]
 		public async Task Handle_ShouldRetrieveFilesBasedOnRequest()
 		{
-			await service.Process(request);
+			await service.Process(request, cancellationToken);
 
-			await fileRetriever.Received().RetrieveToLocalDirectory(request.OriginBucketName, request.OriginResourceName);
+			await fileRetriever.Received().RetrieveToMemory(request.OriginBucketName, request.OriginResourceName, cancellationToken: cancellationToken);
 		}
 
 		[Test]
 		public async Task Handle_ShouldCompressFilesRetrieved()
 		{
-			await service.Process(request);
+			await service.Process(request, cancellationToken);
 
-			await fileZipper.Received().Compress(directory, Arg.Any<bool>());
+			await fileZipper.Received().Compress(compressedFileKey, files, cancellationToken);
 		}
 
 		[Test]
 		public async Task Handle_ShouldUploadCompressedFile()
 		{
-			await service.Process(request);
+			await service.Process(request, cancellationToken);
 
 			await fileUploader
 				.Received()
-				.Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile, CancellationToken.None);
+				.Upload(request.DestinationBucketName, request.DestinationResourceName, compressedFile, cancellationToken);
 		}
 	}
 }
