@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -48,7 +49,11 @@ namespace LambdaS3FileZipper
 			return zipPath;
 		}
 
-		public async Task<FileResponse> Compress(string zipFileKey, IEnumerable<FileResponse> filesResponses, CancellationToken cancellationToken)
+		public async Task<FileResponse> Compress(
+			string zipFileKey,
+			IEnumerable<FileResponse> filesResponses,
+			bool flat = false,
+			CancellationToken cancellationToken = default)
 		{
 			var zipMemoryStream = new MemoryStream();
 
@@ -65,9 +70,10 @@ namespace LambdaS3FileZipper
 				foreach (var fileResponse in filesResponses)
 				{
 					var stopwatch = Stopwatch.StartNew();
-					var zipEntry = zipArchive.CreateEntry(fileResponse.ResourceKey);
+					var entryName = flat ? Path.GetFileName(fileResponse.ResourceKey) : fileResponse.ResourceKey;
+					var entry = zipArchive.CreateEntry(entryName);
 
-					using var zipEntryStream = zipEntry.Open();
+					using var zipEntryStream = entry.Open();
 					using var fileContentStream = fileResponse.ContentStream;
 					await fileContentStream.CopyToAsync(zipEntryStream, 4096, cancellationToken);
 
