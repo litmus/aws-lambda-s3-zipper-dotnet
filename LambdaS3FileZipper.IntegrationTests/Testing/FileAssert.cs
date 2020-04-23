@@ -1,12 +1,15 @@
 ﻿using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using LambdaS3FileZipper.IntegrationTests.Logging;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace LambdaS3FileZipper.IntegrationTests.Testing
 {
 	public static class FileAssert
 	{
+		private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+
 		/// <summary>
 		/// Asserts that file at <see cref="filePath"/> exists
 		/// </summary>
@@ -48,6 +51,26 @@ namespace LambdaS3FileZipper.IntegrationTests.Testing
 			{
 				Assert.That(zipArchive.Entries, Is.Not.Empty);
 			}
+		}
+
+		/// <summary>
+		/// Asserts that the ZIP file at <see cref="filePath"/> exists and is non-empty,
+		/// and has the provided entry file name
+		/// </summary>
+		/// <param name="filePath"></param>
+		/// <param name="entryFileName"></param>
+		public static void ZipHasFilesWithName(string filePath, string entryFileName)
+		{
+			HasContent(filePath);
+
+			using var fileStream = File.OpenRead(filePath);
+			using var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
+			foreach (var entry in zipArchive.Entries)
+			{
+				Log.Info("Found compressed file entry {EntryFullName}", entry.FullName);
+			}
+
+			Assert.That(zipArchive.Entries.Any(entry => entry.FullName == entryFileName), Is.True);
 		}
 	}
 }

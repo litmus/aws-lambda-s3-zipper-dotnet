@@ -34,5 +34,8 @@ namespace LambdaS3FileZipper.IntegrationTests.Testing
 			using var fileStream = File.OpenRead(filePath);
 			return new FileResponse(resourceKey: fileKey, contentStream: await fileStream.CopyStreamOntoMemory(cancellationToken));
 		}
+
+		public static string CreateDirectoryIn(string parentDirectoryPath, string directoryName) =>
+			Directory.CreateDirectory(Path.Combine(parentDirectoryPath, directoryName)).FullName;
 	}
 }
