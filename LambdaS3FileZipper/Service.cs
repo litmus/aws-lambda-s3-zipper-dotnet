@@ -31,7 +31,7 @@ namespace LambdaS3FileZipper
 		    log.Debug("Retrieved files from {Bucket}:{Resource} | {Time}ms", request.OriginBucketName, request.OriginResourceName, stopwatch.ElapsedMilliseconds);
 
 			stopwatch.Restart();
-		    var compressedFile = await fileZipper.Compress(request.DestinationResourceName, files, cancellationToken);
+		    var compressedFile = await fileZipper.Compress(request.DestinationResourceName, files, request.FlatZipFile, cancellationToken);
 		    log.Debug("Compressed files to {CompressedFileName} | {Time}ms", compressedFile.ResourceKey, stopwatch.ElapsedMilliseconds);
 
 			stopwatch.Restart();

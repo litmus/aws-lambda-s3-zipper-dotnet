@@ -18,6 +18,7 @@ namespace LambdaS3FileZipper.Test
 		private Request request;
 		private FileResponse[] files;
 		private string compressedFileKey;
+		private bool flatZipFile;
 		private FileResponse compressedFile;
 		private string url;
 		private CancellationToken cancellationToken;
@@ -27,7 +28,9 @@ namespace LambdaS3FileZipper.Test
 		{
 			compressedFileKey = "compressed-file";
 
-			request = new Request("origin-bucket", "origin-resource", "destination-bucket", compressedFileKey, flatZipFile: true);
+			flatZipFile = true;
+
+			request = new Request("origin-bucket", "origin-resource", "destination-bucket", compressedFileKey, flatZipFile);
 
 			files = new []
 			{
@@ -47,7 +50,7 @@ namespace LambdaS3FileZipper.Test
 			fileRetriever.RetrieveToMemory(request.OriginBucketName, request.OriginResourceName, Arg.Any<string>(), cancellationToken).Returns(files);
 
 			fileZipper = Substitute.For<IFileZipper>();
-			fileZipper.Compress(compressedFileKey, files, cancellationToken).Returns(compressedFile);
+			fileZipper.Compress(compressedFileKey, files, flatZipFile, cancellationToken).Returns(compressedFile);
 
 			fileUploader = Substitute.For<IFileUploader>();
 			fileUploader.Upload("destination-bucket", compressedFileKey, compressedFile, cancellationToken).Returns(url);
@@ -76,7 +79,7 @@ namespace LambdaS3FileZipper.Test
 		{
 			await service.Process(request, cancellationToken);
 
-			await fileZipper.Received().Compress(compressedFileKey, files, cancellationToken);
+			await fileZipper.Received().Compress(compressedFileKey, files, flatZipFile, cancellationToken);
 		}
 
 		[Test]
